@@ -32,11 +32,10 @@
 */
 
 volatile u8 global_u8IRFrameReceivedFlag;
-volatile ir_type_index global_irDataCounter,global_irDataCounterRelative;
+volatile ir_type_index global_irDataCounter,global_irDataCounterRelativeTimeOut,global_irDataCounterRelativeContPress;
 volatile u32 global_u32IRArrSignalTime[IR_MAXSIGNALBUFFER];
 volatile u8	global_u8IRInterruptVirginityFlag=0,global_u8OverFlowFlag=0;
-
-
+volatile u32 global_u32IRTicksContPressCount=0;
 
 extern void HIR_voidEnable(u8 copy_u8ExtiLine,u8 copy_u8ExtiPort)
 {
@@ -44,7 +43,8 @@ extern void HIR_voidEnable(u8 copy_u8ExtiLine,u8 copy_u8ExtiPort)
 
 	ir_type_index i;
 	global_irDataCounter=0;
-	global_irDataCounterRelative=0;
+	global_irDataCounterRelativeTimeOut=0;
+	global_irDataCounterRelativeContPress=0;
 
 	/*Initialize Signal Buffer*/
 	for(i=0;i<IR_MAXSIGNALBUFFER;i++)
@@ -64,10 +64,12 @@ extern void HIR_voidReceiveFrameNEC(void)
 
 	static u8 local_staticSetOverflowNext=0;
 
+
 	/*if not first time to fire interrupt*/
 	if(global_u8IRInterruptVirginityFlag!=0)
 	{
 		global_u32IRArrSignalTime[global_irDataCounter]=MSTK_u32GetElapsedTime();
+		global_u32IRTicksContPressCount += global_u32IRArrSignalTime[global_irDataCounter];
 
 		if( local_staticSetOverflowNext )
 		{
@@ -93,6 +95,12 @@ extern void HIR_voidReceiveFrameNEC(void)
 		else/*impossible*/
 		{
 			asm("nop");
+		}
+
+		if(global_u32IRTicksContPressCount>=120000)
+		{
+			_voidReceptionHandler(IR_CONTEXT_CONTPRESS);
+			global_u32IRTicksContPressCount=0;
 		}
 	}
 
@@ -266,7 +274,21 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			/*Clear Flag to indicate that the next interrupt fire is considered now the first time*/
 			global_u8IRInterruptVirginityFlag=0;
 
+
+		EXTI_voidMaskLine(MEXTI_1);
+			MSTK_voidStopInterval();
+			global_u32IRTicksContPressCount=0;
+
+			global_irDataCounterRelativeTimeOut=0;
+			global_irDataCounterRelativeContPress=0;
+
 			HIR_voidResetFrameBuffer();
+			global_irDataCounter=0;
+		EXTI_voidUNMaskLine(MEXTI_1);
+
+			/*Relative handled in _voidReceptionHandler*/
+//			global_irDataCounterRelativeTimeOut=0;
+//			global_irDataCounterRelativeContPress=0
 
 		}
 
@@ -274,7 +296,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 		/*The Next should be called from the calling function not Here*/
 		//HIR_voidResetFrameBuffer(copy_u32PtrBuffer,copy_ptrDataCounter);
 		//global_irDataCounter=0;
-		//global_irDataCounterRelative=0;
+		//global_irDataCounterRelativeTimeOut=0;
 	}
 
 #if 1
@@ -493,11 +515,10 @@ extern u8 HIR_u8FrameCheckNEC(ir_type_index copy_irFrameStartIndex,volatile u32*
 	return(IR_FRAMESTATUS_INVALID);
 }
 
-
-static void _voidTimeOutHandler(void)
-{	/*The BUS is steady since last negative edge for more than max ticks defined */
-
+static void _voidReceptionHandler(u8 Context)
+{
 	static u8 localstaticFirstTimeOverflow=1;
+
 
 	/*Make Sure that u had at least 33 data signals received since last timeout
 	 *to avoid entering if condition mistakenly when u have for example 35 frame due to a
@@ -508,8 +529,11 @@ static void _voidTimeOutHandler(void)
 		/*In Case of no overflow has occurred, the relative position is as following:
 		 * Formula: RelativePos= CurrentPos - LastPos
 		 */
-		global_irDataCounterRelative = global_irDataCounter - global_irDataCounterRelative;
+		if(Context==IR_CONTEXT_TIMEOUT)
+			global_irDataCounterRelativeTimeOut = global_irDataCounter - global_irDataCounterRelativeTimeOut;
 
+		else if(Context==IR_CONTEXT_CONTPRESS)
+			global_irDataCounterRelativeContPress = global_irDataCounter - global_irDataCounterRelativeContPress;
 		/*Set Default value when no longer overflow*/
 		localstaticFirstTimeOverflow=1;
 	}
@@ -519,26 +543,50 @@ static void _voidTimeOutHandler(void)
 		{
 			/*In Case of overflow occurred to check that we received 33 signalbits from last time we use the following
 			 * Formula:  RelativePos=  MAX_ToOverflow - LastPos +  CurrentPostition*/
-			global_irDataCounterRelative=IR_MAXSIGNALBUFFER - global_irDataCounterRelative  +  global_irDataCounter;
+			if(Context==IR_CONTEXT_TIMEOUT)
+				global_irDataCounterRelativeTimeOut=IR_MAXSIGNALBUFFER - global_irDataCounterRelativeTimeOut  +  global_irDataCounter;
+			else if(Context==IR_CONTEXT_CONTPRESS)
+				global_irDataCounterRelativeContPress=IR_MAXSIGNALBUFFER - global_irDataCounterRelativeContPress  +  global_irDataCounter;
 
 			localstaticFirstTimeOverflow=0;
 		}
 		else
 		{
-			global_irDataCounterRelative = global_irDataCounter - global_irDataCounterRelative;
+			if(Context==IR_CONTEXT_TIMEOUT)
+				global_irDataCounterRelativeTimeOut = global_irDataCounter - global_irDataCounterRelativeTimeOut;
+			else if(Context==IR_CONTEXT_CONTPRESS)
+				global_irDataCounterRelativeContPress = global_irDataCounter - global_irDataCounterRelativeContPress;
+
 		}
 	}
 
+	/*In case that we didn't receive any EXTI (low edge) interrupt for IR_MAXTICKSTOOUT(120ms)
+	 * and before this period we had received at least IR_FRAMEBITLENGTH (33) signalBits
+	 * Then we signal possible frame Reception */
+	if(Context==IR_CONTEXT_TIMEOUT && global_irDataCounterRelativeTimeOut>=IR_FRAMEBITLENGTH)
+	{
+		global_u32IRTicksContPressCount=0;
 
-	if(global_irDataCounterRelative>=33)
+		/*as we received 33 new Bits this could be frame so we signal frame*/
+		global_u8IRFrameReceivedFlag=1;
+		/*Make Relative equal to absolute to count again*/
+		global_irDataCounterRelativeTimeOut=global_irDataCounter;
+		global_irDataCounterRelativeContPress=global_irDataCounter;
+		MGPIO_voidSetPinValue(GPIOA, PIN10,GPIO_LOW);
+	}
+	/*In case that we keep receiving CONTINUOUS Exti Signal (low edge) interrupt for IR_MAXTICKSCONTPRESS(150ms)
+	 * and during this period we had received at least IR_REPEATEDFRAMEBITLENGTH (2) signalBits
+	 * Then we signal possible frame Reception */
+	else if(Context==IR_CONTEXT_CONTPRESS && global_irDataCounterRelativeContPress>=IR_REPEATEDFRAMEBITLENGTH)
 	{
 		/*as we received 33 new Bits this could be frame so we signal frame*/
 		global_u8IRFrameReceivedFlag=1;
 		/*Make Relative equal to absolute to count again*/
-		global_irDataCounterRelative=global_irDataCounter;
+		global_irDataCounterRelativeTimeOut=global_irDataCounter;
+		global_irDataCounterRelativeContPress=global_irDataCounter;
 		MGPIO_voidSetPinValue(GPIOA, PIN10,GPIO_LOW);
 	}
-	/*the EXTI is fired due to noise and then timeout occurred without receiving 33+ signals*/
+	/*timeout occurred without receiving 33+ signals (maybe exti fired by noise)*/
 	else
 	{
 		asm("nop");
@@ -546,6 +594,14 @@ static void _voidTimeOutHandler(void)
 	}
 
 	return;
+}
+
+
+static void _voidTimeOutHandler(void)
+{
+	/*The BUS is steady since last negative edge for more than max ticks defined */
+	asm("nop");
+	_voidReceptionHandler(IR_CONTEXT_TIMEOUT);
 }
 
 

@@ -11,18 +11,12 @@
 #include "LEDMRX_database.h"
 #include "IR_config.h"
 
-extern volatile u8 global_u8IRFrameReceivedFlag,global_u8OverFlowFlag;
+extern volatile u8 global_u8IRFrameReceivedFlag;
 extern volatile u32 global_u32IRArrSignalTime[IR_MAXSIGNALBUFFER];
 
-extern volatile ir_type_index global_irDataCounter,global_irDataCounterRelative;
-
-
-volatile u8 ToBeRepresented[40]={0};
-u8 k=0;
 
 #define NORMALMODE  (1)
 #define TESTMODE    (2)
-//#undef  TESTMODE
 
 #define MODE (NORMALMODE)
 
@@ -39,6 +33,11 @@ u8 k=0;
 	volatile u32 testTargetBuff[IR_MAXSIGNALBUFFER]={EFRAME,MFRAME,EFRAME,MFRAME,EFRAME};
 	u8 testDataQ[]={'E',HIR_MODE,'E',HIR_MODE,0,HIR_MODE};
 #endif
+
+
+#if 0
+	volatile u8 ToBeRepresented[40]={0};
+	u8 k=0;
 
 static void App_voidReadAndReact(u8* DataQ,u8 indexx)
 {
@@ -75,13 +74,36 @@ static void App_voidReadAndReact(u8* DataQ,u8 indexx)
 
 
 }
+#endif
 
 
+static void App_voidReadAndReactUpdated(u8* DataQ)
+{
+	u8 i;
+//	HLEDMRX_voidDisplay(LEDMRX_O, 200000);
+//	return;
 
 
+	for(i=0;i<50;i++)
+	{
+		if(DataQ[i] != 0)
+		{
+			EXTI_voidMaskLine(MEXTI_1);
+
+			if(DataQ[i]==HIR_POWER)
+				HLEDMRX_voidDisplay(LEDMRX_P, 20000);
+			else if(DataQ[i]==HIR_MODE)
+				HLEDMRX_voidDisplay(LEDMRX_M, 20000);
+
+			DataQ[i]=0;
+
+			EXTI_voidUNMaskLine(MEXTI_1);
+		}
+	}
 
 
-
+	return;
+}
 
 
 void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
@@ -103,11 +125,13 @@ void main()
 {
 	//This array to be removed after debugging and check on local var no need to array
 	u8 volatile DataFlagArr[50]={0};
-	u8 AddresQ,DataQ[50]={0};
+	u8 AddresQ,DataQ[50]={0},local_tempLastDataQ=0;
 	u8 j=0,i=0;
 
 
-	volatile u32 possibleframescounter=0,symbolcounter=0,overflowcounter=0;
+
+	volatile u32 possibleframescounter=0,symbolcounter=0;
+
 
 	/*Enable HSE system clock*/
 	MRCC_voidInitSysClock();
@@ -133,6 +157,162 @@ void main()
 	MNVIC_voidInit();
 
 
+
+
+#if MODE==TESTMODE
+	global_u8IRFrameReceivedFlag=1;
+#endif
+	while(1)
+	{
+		if(global_u8IRFrameReceivedFlag)
+		{
+			while(1)
+			{
+			#if MODE==TESTMODE
+				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(testbuff, &AddresQ, &DataQ[j]);
+			#else
+				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(global_u32IRArrSignalTime, &AddresQ, &DataQ[j]);
+			#endif
+
+				if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA)
+				{
+					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
+					i++;
+					break;
+				}
+				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
+				{
+					/*Save Last Received Data*/
+					local_tempLastDataQ=DataQ[j];
+					App_voidReadAndReactUpdated(DataQ);
+					/*Break loop no data left*/
+					i++;
+					j++;
+					break;
+				}
+				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
+				{
+					/*Handle following cases:
+					 * 1-Case where last data received is still in buffer
+					 * 2-Case where we reseted DataQ and we received repeated signal
+					   (i.e First new data equals last data received before clearing buffer)*/
+					DataQ[j]=local_tempLastDataQ;
+					App_voidReadAndReactUpdated(DataQ);
+					/*Break loop no data left*/
+					i++;
+					j++;
+					break;
+				}
+				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
+				{
+					/*Handle following cases:
+					 * 1-Case where last data received is still in buffer
+					 * 2-Case where we reseted DataQ and we received repeated signal
+					   (i.e First new data equals last data received before clearing buffer)*/
+					DataQ[j]=local_tempLastDataQ;
+					App_voidReadAndReactUpdated(DataQ);
+					/*Don't Break loop keep getting data*/
+					i++;
+					j++;
+				}
+				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
+				{
+					/*Save Last Received Data*/
+					local_tempLastDataQ=DataQ[j];
+					App_voidReadAndReactUpdated(DataQ);
+					/*Don't Break loop keep getting data*/
+					i++;
+					j++;
+				}
+				else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
+					asm("nop");  //error
+
+
+				if(global_u8IRFrameReceivedFlag==0)
+				{
+					/*If Flag was Cleared after this means that flag was raised and we checked/extracted all buffer then we cleared flag*/
+					/*Impossible to get here as flag is cleared if we return emptybuf which is followed by break above*/
+					/*Make Your Routine HeRE*/
+					asm("nop");
+					//error
+					break;
+				}
+
+				if(i>49)
+				{
+					//we received more than 50 possible frames
+					possibleframescounter+=50;
+					//Reset buffer index
+					i=0;
+					/*Reset Buffer*/
+					vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
+				}
+				if(j>49)
+				{
+					//we stored more than 50 valid data symbol received
+					symbolcounter+=50;
+					/*Save Last Data Received to handle case if the next check data is repeated
+					 * [j-1] because we incremented j above*/
+					local_tempLastDataQ=DataQ[j-1];
+					//Reset DataQ index
+					j=0;
+					App_voidReadAndReactUpdated(DataQ);
+					/*Reset DataQbuffer*/
+					vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
+				}
+
+			}
+		}
+
+
+#if MODE==TESTMODE
+
+	if(k==2 && global_u8IRFrameReceivedFlag==0)
+	{
+		//for(i=0;i<IR_MAXSIGNALBUFFER;i++)
+			//testbuff[i]=testTargetBuff[i];
+
+		global_u8IRFrameReceivedFlag=1;
+	}
+#endif
+		if(i>49)
+		{
+			//we received more than 50 possible frames
+			possibleframescounter+=50;
+			//Reset buffer index
+			i=0;
+			/*Reset Buffer*/
+			vid_clearBuffer( (void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
+		}
+		if(j>49)
+		{
+			//we stored more than 50 valid data symbol received
+			symbolcounter+=50;
+			/*Save Last Data Received to handle case if the next check data is repeated
+			 * [j-1] because we incremented j above*/
+			local_tempLastDataQ=DataQ[j-1];
+			//Reset DataQ index
+			j=0;
+			App_voidReadAndReactUpdated(DataQ);
+			/*Reset DataQbuffer*/
+			vid_clearBuffer((void*)DataQ,(sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]));
+		}
+	}
+
+	//can't break the main while 1
+	asm("nop");
+
+
+
+
+
+
+
+
+
+
+
+#if 0
 
 #if MODE==TESTMODE
 	global_u8IRFrameReceivedFlag=1;
@@ -273,5 +453,6 @@ void main()
 
 	//can't break the main while 1
 	asm("nop");
+#endif
 }
 

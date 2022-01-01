@@ -11,9 +11,9 @@
 #include "GPIO_interface.h"
 
 /*the maximum Microseconds that if no interrupt received again after it then frame is not correct
- * it takes 110ms to repeat frame from data sheet so 130ms is good time*/
+ * it takes 108ms to repeat frame from data sheet so 115ms is good time*/
 
-#define IR_MAXTICKSTOOUT		(120000ul)
+#define IR_MAXTICKSTOOUT		(115000ul)
 
 /*The Maximum number of signal times stored*/
 #define IR_MAXSIGNALBUFFER				(255u)
@@ -29,8 +29,8 @@
 #define IR_SIGNAL1_HIGHER  				(2500u)
 #define IR_SIGN_REPEAT_FIRST_LOWER0		(40000u)
 #define IR_SIGN_REPEAT_FIRST_HIGHER0	(43000u)
-#define IR_SIGN_REPEAT_NONFIRST_LOWER0	(97000ul)
-#define IR_SIGN_REPEAT_NONFIRST_HIGHER0	(99200ul)
+#define IR_SIGN_REPEAT_NONFIRST_LOWER0	(96500ul)
+#define IR_SIGN_REPEAT_NONFIRST_HIGHER0	(97500ul)
 #define IR_SIGN_REPEAT_LOWER1			(11000u)
 #define IR_SIGN_REPEAT_HIGHER1			(11400u)
 

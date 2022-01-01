@@ -1,9 +1,10 @@
 /***********************************/
 /*Author: Shehab emad*/
-/*Version 1.3*/
+/*Version 1.4*/
 /*Data:19/7/2021*/
 
 /*Based on Timer2 instead on MSTK*/
+/*Disabled all rows and columns after exit*/
 /**************************************/
 
 #include"STD_TYPES.h"
@@ -197,6 +198,8 @@ extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
 			local_u32Counter+=2500;
 		}
 	}
+	HLEDMRX_voidDisableAllColumn();
+	HLEDMRX_voidDisableAllRow();
 }
 
 
