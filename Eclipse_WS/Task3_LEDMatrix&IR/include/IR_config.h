@@ -14,6 +14,8 @@
  * it takes 108ms to repeat frame from data sheet so 115ms is good time*/
 
 #define IR_MAXTICKSTOOUT		(115000ul)
+/*Time before check if this is continuous press*/
+#define IR_CONTPRESSTIME		(120000ul)
 
 /*The Maximum number of signal times stored*/
 #define IR_MAXSIGNALBUFFER				(255u)

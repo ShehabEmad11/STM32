@@ -32,10 +32,12 @@
 */
 
 volatile u8 global_u8IRFrameReceivedFlag;
-volatile ir_type_index global_irDataCounter,global_irDataCounterRelativeTimeOut,global_irDataCounterRelativeContPress;
+volatile ir_type_index global_irDataCounter,global_irDataCounterRelativeTimeOut,global_irDataCounterRelativeContPress,global_irDataCounterRelativeApp=0;
 volatile u32 global_u32IRArrSignalTime[IR_MAXSIGNALBUFFER];
 volatile u8	global_u8IRInterruptVirginityFlag=0,global_u8OverFlowFlag=0;
 volatile u32 global_u32IRTicksContPressCount=0;
+
+volatile u32 AppRelative=0;
 
 extern void HIR_voidEnable(u8 copy_u8ExtiLine,u8 copy_u8ExtiPort)
 {
@@ -97,12 +99,15 @@ extern void HIR_voidReceiveFrameNEC(void)
 			asm("nop");
 		}
 
-		if(global_u32IRTicksContPressCount>=120000)
+		if(global_u32IRTicksContPressCount>=IR_CONTPRESSTIME)
 		{
 			_voidReceptionHandler(IR_CONTEXT_CONTPRESS);
 			global_u32IRTicksContPressCount=0;
 		}
 	}
+
+	if(global_irDataCounter%33==0  && global_irDataCounter>33)
+		asm("nop"); //debugging
 
 	global_u8IRInterruptVirginityFlag=1;
 	/*start/restart time and if no EXTI interrupt fire again until MAXTICKS OUT--> run handler*/
@@ -141,9 +146,10 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 {
 	static ir_type_index local_staticCurrentBufferIndex=0;
 	static u8 local_u8StaticDataExtractedFlag=0;
-	static u32* local_u32StaticPtrBuffer=0;
-	u8 local_u8AllBufferCheckedFlag=0;
+	static u32* local_u32StaticPtrBuffer=NULL;
+
 	u8 local_u8FrameStatus=IR_FRAMESTATUS_INVALID;
+	u8 local_u8HeadTailMatchFlag=0;
 
 	volatile u32 tempBuf[33]={0};
 
@@ -152,7 +158,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 	 * But what if when we recall the function it is called for different buffer? then:
 	   we have to reset the static flags and static indexes */
 	/*If the function used for some buffer before:*/
-	if(local_u32StaticPtrBuffer!=0)
+	if(local_u32StaticPtrBuffer!=NULL)
 	{
 		/*And if the new buffer not the same as the old one....*/
 		if(local_u32StaticPtrBuffer!=copy_u32PtrBuffer)
@@ -163,18 +169,22 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 		}
 	}
 
-	while((u32)local_staticCurrentBufferIndex + 1ul <= (u32)IR_MAXSIGNALBUFFER)
+//	if(global_irDataCounter>=33)
+//		asm("nop"); //debugging
+
+	while(local_staticCurrentBufferIndex != global_irDataCounter )
 	{
 
 		/*THE Received flag is SET by MSTK_Interrupt callback under some conditions
 		  and cleared when the buffer is fully read by this function*/
+#if 0
 		if( global_u8IRFrameReceivedFlag==0)
 		{
 			/*Function called while their is no data received
 			 * -the caller forgot to check received data flag-*/
 			return IR_DATA_NON_RECEIVED;
 		}
-
+#endif
 		/*Get The Current Frame Status (VALID,Repeated,UnValid)*/
 		_voidCopyFrame((u32*)tempBuf,(u32*)copy_u32PtrBuffer,local_staticCurrentBufferIndex);
 		local_u8FrameStatus=HIR_u8FrameCheckNEC(0,tempBuf);
@@ -196,9 +206,9 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 				  and allow it then to recall again so that we continue extract
 				  rest of data still in the buffer*/
 				/*increment the buffer with 33 signal as it was valid frame*/
-				if( (u32)local_staticCurrentBufferIndex+ (u32)IR_FRAMEBITLENGTH  >= (u32)IR_MAXSIGNALBUFFER)
+				if( (u32)local_staticCurrentBufferIndex+ (u32)IR_FRAMEBITLENGTH  > (u32)global_irDataCounter)
 				{
-					local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+					local_staticCurrentBufferIndex=global_irDataCounter;
 				}
 				else
 				{
@@ -221,9 +231,9 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			  and allow it then to recall again so that we continue extract
 			  rest of data still in the buffer*/
 			/*increment the buffer with 2 signal as it was repeated frame*/
-			if( (u32)local_staticCurrentBufferIndex+ (u32)IR_REPEATEDFRAMEBITLENGTH  >= (u32)IR_MAXSIGNALBUFFER)
+			if( (u32)local_staticCurrentBufferIndex+ (u32)IR_REPEATEDFRAMEBITLENGTH  >= (u32)global_irDataCounter)
 			{
-				local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+				local_staticCurrentBufferIndex=global_irDataCounter;
 			}
 			else
 			{
@@ -236,14 +246,24 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			/*if we proceeded to here inside loop without break---> this means the following:
 			 *The frame was non-valid and we didn't send back any data through input arguments
 			  so we have to increment current buffer position and continue checking buffer in loop */
-			if( (u32)local_staticCurrentBufferIndex + 1ul  >= (u32)IR_MAXSIGNALBUFFER)
+			if( (u32)local_staticCurrentBufferIndex  < (u32)global_irDataCounter)
 			{
-				local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+				local_staticCurrentBufferIndex++;
+			}
+			else if( (u32)local_staticCurrentBufferIndex  > (u32)global_irDataCounter)
+			{
+				if(local_staticCurrentBufferIndex < IR_MAXSIGNALBUFFER)
+					local_staticCurrentBufferIndex ++;
+				else if(local_staticCurrentBufferIndex == IR_MAXSIGNALBUFFER)
+					local_staticCurrentBufferIndex=0;
+				else
+					asm ("nop");
 			}
 			else
 			{
-				local_staticCurrentBufferIndex ++;
+				local_staticCurrentBufferIndex=global_irDataCounter;
 			}
+
 		}
 	}
 
@@ -256,13 +276,16 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
          this in the next if condition then we will have to reset the following flags:
 	     received data flag,data pos, interrupt first occurrence , buffer pos.
 	     and we have to indicate that no more data in buffer*/
-	if(local_staticCurrentBufferIndex>=IR_MAXSIGNALBUFFER)
+	if(local_staticCurrentBufferIndex==global_irDataCounter)
 	{
 
+#if 0
 		/*Reset Current Buffer Index*/
 		local_staticCurrentBufferIndex=0;
+#endif
 		/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
-		local_u8AllBufferCheckedFlag=1;
+		local_u8HeadTailMatchFlag=1;
+
 		/*Reset the static buffer to indicate that the next function call is new call
 		 * with new buffer even it is the same buffer we start over*/
 		local_u32StaticPtrBuffer=0;
@@ -274,7 +297,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			/*Clear Flag to indicate that the next interrupt fire is considered now the first time*/
 			global_u8IRInterruptVirginityFlag=0;
 
-
+#if 0
 		EXTI_voidMaskLine(MEXTI_1);
 			MSTK_voidStopInterval();
 			global_u32IRTicksContPressCount=0;
@@ -287,25 +310,23 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 		EXTI_voidUNMaskLine(MEXTI_1);
 
 			/*Relative handled in _voidReceptionHandler*/
-//			global_irDataCounterRelativeTimeOut=0;
-//			global_irDataCounterRelativeContPress=0
-
+	//		global_irDataCounterRelativeTimeOut=0;
+	//		global_irDataCounterRelativeContPress=0
+#endif
 		}
-
-
 		/*The Next should be called from the calling function not Here*/
 		//HIR_voidResetFrameBuffer(copy_u32PtrBuffer,copy_ptrDataCounter);
 		//global_irDataCounter=0;
 		//global_irDataCounterRelativeTimeOut=0;
 	}
 
-#if 1
+
 	/* it is not possible to not receive any data and didn't finish all buffer and you reached here
 	 * so no case in which DataExtractedFlag and BufferCheckedFlag both are zero */
 
 	/* Case 1: we finished the buffer and we didn't got data in this run
 	 * return IR_DATA_NO_VALID_DATA*/
-	if((local_u8FrameStatus==IR_FRAMESTATUS_INVALID) && local_u8AllBufferCheckedFlag==1)
+	if((local_u8FrameStatus==IR_FRAMESTATUS_INVALID) && local_u8HeadTailMatchFlag==1)
 	{
 		local_u32StaticPtrBuffer=0;
 		return IR_DATA_NO_VALID_DATA;
@@ -313,7 +334,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 	/*Case 2: If this was valid frame which we returned by now */
 	else if( (local_u8FrameStatus==IR_FRAMESTATUS_VALID) && local_u8StaticDataExtractedFlag )
 	{
-		if(local_u8AllBufferCheckedFlag)
+		if(local_u8HeadTailMatchFlag)
 		{
 			/*Case 2.1:
 			 * VALID Frame Returned by now and we have checked all the buffer:
@@ -321,7 +342,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			local_u8StaticDataExtractedFlag=0;
 			return IR_DATA_EXTRACTED_EMPTYBUF;
 		}
-		else if(local_u8AllBufferCheckedFlag==0)
+		else if(local_u8HeadTailMatchFlag==0)
 		{
 			/*Case 2.2
 			 *Valid frame which we returned by now BUT we didn't finish checking all the buffer:
@@ -335,7 +356,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 	/* Case 3: This was repeated frame which we returned by now*/
 	else if((local_u8FrameStatus==IR_FRAMESTATUS_REPEATED) && local_u8StaticDataExtractedFlag )
 	{
-		if(local_u8AllBufferCheckedFlag)
+		if(local_u8HeadTailMatchFlag)
 		{
 			/*Case 3.1:
 			 * Repeated Frame Returned by now and we have checked all the buffer:
@@ -343,7 +364,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			local_u8StaticDataExtractedFlag=0;
 			return IR_DATA_REPEATEXTRACTED_EMPTYBUF;
 		}
-		else if(local_u8AllBufferCheckedFlag==0)
+		else if(local_u8HeadTailMatchFlag==0)
 		{
 			/*Case 3.2
 			 *Repeated frame which we returned by now BUT we didn't finish checking all the buffer:
@@ -354,57 +375,11 @@ extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,
 			return IR_DATA_REPEATEXTRACTED_PARTIALBUF;
 		}
 	}
-#if 0
-	else if(global_u8OverFlowFlag ==1)
-	{
-		/*THE Received flag is SET by MSTK_Interrupt callback under some conditions
-		  and cleared when the buffer is fully read by this function
-		 *The following condition handles case:
-		   *-Data received and written to buffer until buffer overflow occur disabled as it is handled by another method*/
-		return IR_DATA_OVERFLOWBUF;
-	}
-#endif
 	else
 	{
 		asm("nop");
 		return IR_LOGICERROR;
 	}
-
-#endif
-
-
-#if 0
-	/*it is not possible to not receive any data and didn't finish all buffer and you reached here
-	 * so no case in which DataExtractedFlag and BufferCheckedFlag both are zero */
-	/*First Case:
-	 *If we this was valid frame which we returned by now and we have checked all the buffer:
-	 *Then reset DataExtractedFlag & return IR_DATA_EXTRACTED_EMPTYBUF ;*/
-	if(local_u8StaticDataExtractedFlag && local_u8AllBufferCheckedFlag)
-	{
-		local_u8StaticDataExtractedFlag=0;
-		return IR_DATA_EXTRACTED_EMPTYBUF;
-	}
-	/*Second Case we finished the buffer and we didn't got data
-	 * return IR_DATA_NOT_EXTRACTED*/
-	else if(local_u8StaticDataExtractedFlag==0 && local_u8AllBufferCheckedFlag==1)
-	{
-		local_u32StaticPtrBuffer=0;
-		return IR_DATA_NOT_EXTRACTED_EMPTYBUF;
-	}
-	/*Third Case:
-	 *If we got valid frame which we returned by now and we didn't finish checking all the buffer:
-	 *Then we return IR_DATA_EXTRACTED_PARTIALBUF to be indicated by calling function to recall again*/
-	else if(local_u8StaticDataExtractedFlag==1 && local_u8AllBufferCheckedFlag==0)
-	{
-		/*Keep the DataExtracted Flag un reset to indicate when re-enter function in next call
-		 *It is only reset in case of finishing buffer and extracted data
-		 or in case of from the beginning no extract of data happened*/
-		return IR_DATA_EXTRACTED_PARTIALBUF;
-	}
-	else
-		asm("nop");
-
-#endif
 
 	/*Default which will not occur*/
 	return IR_IMPOSSIBLETRET;
@@ -513,6 +488,61 @@ extern u8 HIR_u8FrameCheckNEC(ir_type_index copy_irFrameStartIndex,volatile u32*
 	}
 
 	return(IR_FRAMESTATUS_INVALID);
+}
+
+extern void HIR_voidSyncUnreadSignalsCount(void)
+{
+	global_irDataCounterRelativeApp=global_irDataCounter;
+}
+extern void HIR_voidResetUnreadSignalsCount(void)
+{
+	global_irDataCounterRelativeApp=0;
+}
+extern void HIR_voidCalculateUnReadSignalsCount(u32* copy_PtrU32RelativeOut)
+{
+	/*
+	 -Valid Frames Timings are:
+	 * 67.5 ms		//33 signals received
+	 * 108  ms		//2 OR 33+2 signals received
+
+	 -Make Sure to check relative frames received during this period
+    */
+	static u8 localstaticFirstTimeOverflow=1;
+
+
+	/*Make Sure that u had at least 33 data signals received since last timeout
+	 *to avoid entering if condition mistakenly when u have for example 35 frame due to a
+	  noise occurred after last frame received
+	 *The relative counter must be reset with global counter */
+	if( !global_u8OverFlowFlag )
+	{
+		/*In Case of no overflow has occurred, the relative position is as following:
+		 * Formula: RelativePos= CurrentPos - LastPos
+		 */
+		*copy_PtrU32RelativeOut = global_irDataCounter - global_irDataCounterRelativeApp;
+
+		/*Set Default value when no longer overflow*/
+		localstaticFirstTimeOverflow=1;
+	}
+	else if(global_u8OverFlowFlag)
+	{
+		if(localstaticFirstTimeOverflow)
+		{
+			/*In Case of overflow occurred to check that we received 33 signalbits from last time we use the following
+			 * Formula:  RelativePos=  MAX_ToOverflow - LastPos +  CurrentPostition*/
+			*copy_PtrU32RelativeOut = IR_MAXSIGNALBUFFER - global_irDataCounterRelativeApp  +  global_irDataCounter;
+
+			localstaticFirstTimeOverflow=0;
+		}
+		else
+		{
+			*copy_PtrU32RelativeOut = global_irDataCounter - global_irDataCounterRelativeApp;
+		}
+	}
+	else //Impossible
+		asm("nop");
+
+	return;
 }
 
 static void _voidReceptionHandler(u8 Context)
@@ -721,29 +751,3 @@ static u8 _u8GetFrameData(volatile u32* copy_u32PtrBuffer,ir_type_index copy_sta
 	return 1;
 }
 
-
-
-#if 0
-/*This function will be canceled as i consider it application function not driver
-extern u8 HIR_u8CheckAndGetData(volatile u32* copy_u32PtrBuffer,u8 *copy_u8RetPtrAddrQueue
-								,u8 *copy_u8RetPtrDataQueue,u8 copy_u8CurrentQueueIndex)*/
-{
-	/*If No Data Found the function will return*/
-
-
-	u8 local_u8Flag,j;
-	local_u8Flag=0;
-	j=0;
-
-	if(global_u8IRFrameReceivedFlag)
-	{
-		do{
-			local_u8Flag=HIR_u8ExtractDataFromBuffer(copy_u32PtrBuffer, copy_u8RetPtrAddrQueue+copy_u8CurrentQueueIndex
-																	  , copy_u8RetPtrDataQueue+copy_u8CurrentQueueIndex);
-			copy_u8CurrentQueueIndex++;
-		}while(local_u8Flag==125);
-	}
-
-	return local_u8Flag;
-}
-#endif

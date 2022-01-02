@@ -29,7 +29,7 @@ enum IR_DATAEXTRACTION_RESULT
 	IR_DATA_REPEATEXTRACTED_PARTIALBUF,	//4
 	IR_DATA_OVERFLOWBUF=77u,            //77
 	IR_LOGICERROR=88,					//88
-	IR_DATA_NON_RECEIVED=99u,			//99
+//	IR_DATA_NON_RECEIVED=99u,			//99
 	IR_IMPOSSIBLETRET=199u				//199
 };
 
@@ -39,6 +39,10 @@ extern void HIR_voidReceiveFrameNEC(void);
 extern u8 HIR_u8FrameCheckNEC(ir_type_index copy_u8FrameStartIndex,volatile u32* copy_u32PtrFrameBuffer);
 extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData);
 extern void HIR_voidResetFrameBuffer(void);
+extern void HIR_voidCalculateUnReadSignalsCount(u32* copy_PtrU32RelativeOut);
+extern void HIR_voidSyncUnreadSignalsCount(void);
+extern void HIR_voidResetUnreadSignalsCount(void);
+
 
 
 #endif

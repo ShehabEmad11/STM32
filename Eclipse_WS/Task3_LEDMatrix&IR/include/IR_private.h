@@ -13,6 +13,7 @@
 #define IR_MAXSIGNALBUFFER			(255u)
 #define IR_CONTEXT_TIMEOUT			(0)
 #define IR_CONTEXT_CONTPRESS		(1)
+#define NULL						((void*) 0)
 
 #if IR_MAXSIGNALBUFFER<=255
 	typedef u8 ir_type_index;

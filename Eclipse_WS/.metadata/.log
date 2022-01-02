@@ -2406,3 +2406,1001 @@ java.lang.Exception: Remote communication error.  Target disconnected.: Not a di
 
 !ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 05:19:34.171
 !MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@2fbada1d): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+!SESSION 2022-01-01 05:26:18.096 -----------------------------------------------
+eclipse.buildId=4.19.0.I20210303-1800
+java.version=15.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.embedcpp.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.embedcpp.product
+
+!ENTRY org.eclipse.egit.ui 2 0 2022-01-01 05:26:39.935
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Lenovo'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.ui.ide 4 4 2022-01-01 05:26:46.810
+!MESSAGE Not properly disposed SWT resource
+!STACK 0
+java.lang.Error: SWT Resource was not properly disposed
+	at org.eclipse.swt.graphics.Resource.initNonDisposeTracking(Resource.java:172)
+	at org.eclipse.swt.graphics.Resource.<init>(Resource.java:120)
+	at org.eclipse.swt.graphics.Image.<init>(Image.java:165)
+	at org.eclipse.swt.graphics.Image.win32_new(Image.java:2163)
+	at org.eclipse.swt.widgets.TaskBar.createShellLink(TaskBar.java:168)
+	at org.eclipse.swt.widgets.TaskBar.createShellLinkArray(TaskBar.java:208)
+	at org.eclipse.swt.widgets.TaskBar.setMenu(TaskBar.java:382)
+	at org.eclipse.swt.widgets.TaskItem.setMenu(TaskItem.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.setMenuOnTaskItem(TaskBarManager.java:121)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.update(TaskBarManager.java:112)
+	at org.eclipse.jface.action.MenuManager.update(MenuManager.java:673)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.addSystemTaskBarActions(TasksUiPlugin.java:479)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.access$7(TasksUiPlugin.java:458)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin$TasksUiInitializationJob.runInUIThread(TasksUiPlugin.java:394)
+	at org.eclipse.ui.progress.UIJob.lambda$0(UIJob.java:95)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:185)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4001)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3629)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1157)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1046)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:155)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:644)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:551)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:156)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:203)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:401)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:653)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:590)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1461)
+
+!ENTRY org.eclipse.ui.ide 4 4 2022-01-01 05:26:46.812
+!MESSAGE Not properly disposed SWT resource
+!STACK 0
+java.lang.Error: SWT Resource was not properly disposed
+	at org.eclipse.swt.graphics.Resource.initNonDisposeTracking(Resource.java:172)
+	at org.eclipse.swt.graphics.Resource.<init>(Resource.java:120)
+	at org.eclipse.swt.graphics.Image.<init>(Image.java:165)
+	at org.eclipse.swt.graphics.Image.win32_new(Image.java:2163)
+	at org.eclipse.swt.widgets.TaskBar.createShellLink(TaskBar.java:168)
+	at org.eclipse.swt.widgets.TaskBar.createShellLinkArray(TaskBar.java:208)
+	at org.eclipse.swt.widgets.TaskBar.setMenu(TaskBar.java:382)
+	at org.eclipse.swt.widgets.TaskItem.setMenu(TaskItem.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.setMenuOnTaskItem(TaskBarManager.java:121)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.update(TaskBarManager.java:112)
+	at org.eclipse.jface.action.MenuManager.update(MenuManager.java:673)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.addSystemTaskBarActions(TasksUiPlugin.java:479)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.access$7(TasksUiPlugin.java:458)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin$TasksUiInitializationJob.runInUIThread(TasksUiPlugin.java:394)
+	at org.eclipse.ui.progress.UIJob.lambda$0(UIJob.java:95)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:185)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4001)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3629)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1157)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1046)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:155)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:644)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:551)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:156)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:203)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:401)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:653)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:590)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1461)
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 06:21:49.566
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 06:21:49.712
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 06:48:44.842
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 06:48:44.950
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 06:50:19.586
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 06:50:19.692
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 07:00:51.346
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 07:00:51.455
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:30:50.652
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:30:51.782
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:34:46.727
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:34:46.841
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 15:35:03.142
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@2db2cbe7): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:41:16.930
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:41:17.047
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:42:14.578
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:42:14.686
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:43:12.012
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 15:43:12.119
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:35:06.417
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:35:07.723
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:35:36.183
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@6b7253aa): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:35:38.285
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@15a0dd85): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:35:44.658
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4f7a74db): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:37:34.573
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@441e72f0): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:41:19.356
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@231532c): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:41:29.631
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:41:29.776
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:41:47.134
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:41:47.400
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:42:06.843
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@37cb4c79): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:42:08.398
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@793b3a52): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:42:13.589
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:42:13.893
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:42:40.090
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:42:40.275
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:42:44.328
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@77a9c7f1): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:42:45.674
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4e574587): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:43:37.496
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@241d2721): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:45:02.005
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:45:02.223
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:45:28.778
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@2043a2e9): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:47:04.839
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@46993fa7): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:47:23.559
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@5f9483f6): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:47:46.161
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:47:46.272
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:48:13.297
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@55e141a3): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-01 23:58:41.496
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@51da4f71): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:58:50.998
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-01 23:58:51.139
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:00:00.678
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:00:00.915
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:01:16.040
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:01:16.258
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 5012 2022-01-02 00:01:26.942
+!MESSAGE Error in final launch sequence
+!STACK 1
+org.eclipse.core.runtime.CoreException: Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launchDebugSession(LaunchConfigurationDelegate.java:453)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launchDebugger(LaunchConfigurationDelegate.java:178)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launch(LaunchConfigurationDelegate.java:154)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:803)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1021)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$2.run(DebugUIPlugin.java:1224)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Contains: Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+java.lang.Exception: Remote communication error.  Target disconnected.: Not a directory.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+!SUBENTRY 1 org.eclipse.cdt.dsf 4 10004 2022-01-02 00:01:26.943
+!MESSAGE Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+!SUBENTRY 2 org.eclipse.cdt.dsf.gdb 4 10004 2022-01-02 00:01:26.943
+!MESSAGE Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+!STACK 0
+java.lang.Exception: Remote communication error.  Target disconnected.: Not a directory.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.core 4 0 2022-01-02 00:01:32.668
+!MESSAGE Debug session 'Task3_LEDMatrix_IR Debug' already started. Terminate the first one before restarting.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:01:32.704
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:01:32.873
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:01:40.195
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:01:40.389
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:03:57.070
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:03:57.454
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:04:47.133
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:04:47.279
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:06:06.496
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:06:06.729
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:06:51.494
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:06:51.815
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:07:12.925
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@105f6c8a): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:07:12.927
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@c143c58): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:07:25.352
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@60c89fb8): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:07:25.354
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@18d0079f): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:07:34.253
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@903a5a8): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:07:34.255
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@61f6178a): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:07:40.580
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:07:40.795
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:18.333
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@46257391): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:18.335
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@255e4ea6): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:18.337
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4dfa9e4f): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:08:36.639
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:08:36.750
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:53.855
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4d63a38b): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:53.857
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4683e74c): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:53.858
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@11351a0d): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:08:53.860
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@3fa89de): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:10:12.171
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:10:12.480
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 5012 2022-01-02 00:10:19.357
+!MESSAGE Error in final launch sequence
+!STACK 1
+org.eclipse.core.runtime.CoreException: Failed to execute MI command:
+monitor reset halt
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Success. ,Failed to execute MI command:
+monitor halt
+Error message from debugger back end:
+"monitor" command not supported by this target. ,Failed to execute MI command:
+monitor reg
+Error message from debugger back end:
+"monitor" command not supported by this target. ,Failed to execute MI command:
+continue
+Error message from debugger back end:
+The program is not being run.
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launchDebugSession(LaunchConfigurationDelegate.java:453)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launchDebugger(LaunchConfigurationDelegate.java:178)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launch(LaunchConfigurationDelegate.java:154)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:803)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1021)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$2.run(DebugUIPlugin.java:1224)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Contains: Failed to execute MI command:
+monitor reset halt
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Success.
+java.lang.Exception: Remote communication error.  Target disconnected.: Success.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+Contains: Failed to execute MI command:
+monitor halt
+Error message from debugger back end:
+"monitor" command not supported by this target.
+java.lang.Exception: "monitor" command not supported by this target.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+Contains: Failed to execute MI command:
+monitor reg
+Error message from debugger back end:
+"monitor" command not supported by this target.
+java.lang.Exception: "monitor" command not supported by this target.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+Contains: Failed to execute MI command:
+continue
+Error message from debugger back end:
+The program is not being run.
+java.lang.Exception: The program is not being run.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+!SUBENTRY 1 org.eclipse.cdt.dsf 4 10004 2022-01-02 00:10:19.357
+!MESSAGE Failed to execute MI command:
+monitor reset halt
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Success. ,Failed to execute MI command:
+monitor halt
+Error message from debugger back end:
+"monitor" command not supported by this target. ,Failed to execute MI command:
+monitor reg
+Error message from debugger back end:
+"monitor" command not supported by this target. ,Failed to execute MI command:
+continue
+Error message from debugger back end:
+The program is not being run.
+!SUBENTRY 2 org.eclipse.cdt.dsf.gdb 4 10004 2022-01-02 00:10:19.357
+!MESSAGE Failed to execute MI command:
+monitor reset halt
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Success.
+!STACK 0
+java.lang.Exception: Remote communication error.  Target disconnected.: Success.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+!SUBENTRY 2 org.eclipse.cdt.dsf.gdb 4 10004 2022-01-02 00:10:19.357
+!MESSAGE Failed to execute MI command:
+monitor halt
+Error message from debugger back end:
+"monitor" command not supported by this target.
+!STACK 0
+java.lang.Exception: "monitor" command not supported by this target.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+!SUBENTRY 2 org.eclipse.cdt.dsf.gdb 4 10004 2022-01-02 00:10:19.357
+!MESSAGE Failed to execute MI command:
+monitor reg
+Error message from debugger back end:
+"monitor" command not supported by this target.
+!STACK 0
+java.lang.Exception: "monitor" command not supported by this target.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+!SUBENTRY 2 org.eclipse.cdt.dsf.gdb 4 10004 2022-01-02 00:10:19.357
+!MESSAGE Failed to execute MI command:
+continue
+Error message from debugger back end:
+The program is not being run.
+!STACK 0
+java.lang.Exception: The program is not being run.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:10:27.403
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:10:27.681
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:14:13.545
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:14:13.697
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:15:08.888
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4ee3ae56): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:15:08.890
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@282fdb63): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:15:08.891
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@2704fc14): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:15:08.893
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4f1d8f32): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:17:31.371
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@673d41): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:17:31.373
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@494e71b6): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:17:31.374
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@2142772b): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:17:31.376
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@7dfb2c3c): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:27:37.237
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@48be5991): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:27:37.238
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@6eae7fb9): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:27:37.238
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@53ef104e): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:27:37.239
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@665f29f6): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:27:58.238
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:27:58.543
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:28:29.693
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@236970e2): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:28:29.695
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@51c20597): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:28:29.696
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@3a9b04e0): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:28:29.697
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@2cf1aa5f): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:29:08.315
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@43c40321): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:29:08.317
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@32cfa9af): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:29:08.318
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4073f6ab): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:29:08.320
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@23d8400e): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:29:15.902
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:29:16.290
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:32:06.237
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:32:06.368
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:32:29.060
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:32:29.350
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:32:37.852
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:32:38.065
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:41:40.204
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@7f2d52e2): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:41:40.206
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@1a557758): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:41:40.208
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@6cec42ec): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:41:40.209
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@38b231d4): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:41:40.210
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@74371901): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:41:44.579
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:41:44.695
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:42:44.300
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@797d2950): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:42:44.301
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@3e2e9f3c): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:42:44.303
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4cfe1118): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:42:44.304
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@44e34129): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 00:42:44.305
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@15df3054): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:42:56.783
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:42:57.064
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:43:05.727
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:43:05.867
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.core.jobs 2 2 2022-01-02 00:45:06.804
+!MESSAGE Job found still running after platform shutdown.  Jobs should be canceled by the plugin that scheduled them during shutdown: org.eclipse.cdt.dsf.gdb.internal.ui.console.GdbBasicCliConsole$ErrorReadJob
+
+!ENTRY org.eclipse.core.jobs 2 2 2022-01-02 00:45:06.805
+!MESSAGE Job found still running after platform shutdown.  Jobs should be canceled by the plugin that scheduled them during shutdown: org.eclipse.cdt.dsf.gdb.internal.ui.console.GdbBasicCliConsole$ErrorReadJob
+
+!ENTRY org.eclipse.core.jobs 2 2 2022-01-02 00:45:06.805
+!MESSAGE Job found still running after platform shutdown.  Jobs should be canceled by the plugin that scheduled them during shutdown: org.eclipse.debug.internal.ui.DebugUIPlugin$2
+
+!ENTRY org.eclipse.core.jobs 2 2 2022-01-02 00:45:06.805
+!MESSAGE Job found still running after platform shutdown.  Jobs should be canceled by the plugin that scheduled them during shutdown: org.eclipse.cdt.dsf.gdb.internal.ui.console.GdbBasicCliConsole$ErrorReadJob
+!SESSION 2022-01-02 00:45:09.619 -----------------------------------------------
+eclipse.buildId=4.19.0.I20210303-1800
+java.version=15.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.embedcpp.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.embedcpp.product
+
+!ENTRY org.eclipse.egit.ui 2 0 2022-01-02 00:45:23.803
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Lenovo'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.ui.ide 4 4 2022-01-02 00:45:29.205
+!MESSAGE Not properly disposed SWT resource
+!STACK 0
+java.lang.Error: SWT Resource was not properly disposed
+	at org.eclipse.swt.graphics.Resource.initNonDisposeTracking(Resource.java:172)
+	at org.eclipse.swt.graphics.Resource.<init>(Resource.java:120)
+	at org.eclipse.swt.graphics.Image.<init>(Image.java:165)
+	at org.eclipse.swt.graphics.Image.win32_new(Image.java:2163)
+	at org.eclipse.swt.widgets.TaskBar.createShellLink(TaskBar.java:168)
+	at org.eclipse.swt.widgets.TaskBar.createShellLinkArray(TaskBar.java:208)
+	at org.eclipse.swt.widgets.TaskBar.setMenu(TaskBar.java:382)
+	at org.eclipse.swt.widgets.TaskItem.setMenu(TaskItem.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.setMenuOnTaskItem(TaskBarManager.java:121)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.update(TaskBarManager.java:112)
+	at org.eclipse.jface.action.MenuManager.update(MenuManager.java:673)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.addSystemTaskBarActions(TasksUiPlugin.java:479)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.access$7(TasksUiPlugin.java:458)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin$TasksUiInitializationJob.runInUIThread(TasksUiPlugin.java:394)
+	at org.eclipse.ui.progress.UIJob.lambda$0(UIJob.java:95)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:185)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4001)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3629)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1157)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1046)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:155)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:644)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:551)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:156)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:203)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:401)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:653)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:590)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1461)
+
+!ENTRY org.eclipse.ui.ide 4 4 2022-01-02 00:45:29.207
+!MESSAGE Not properly disposed SWT resource
+!STACK 0
+java.lang.Error: SWT Resource was not properly disposed
+	at org.eclipse.swt.graphics.Resource.initNonDisposeTracking(Resource.java:172)
+	at org.eclipse.swt.graphics.Resource.<init>(Resource.java:120)
+	at org.eclipse.swt.graphics.Image.<init>(Image.java:165)
+	at org.eclipse.swt.graphics.Image.win32_new(Image.java:2163)
+	at org.eclipse.swt.widgets.TaskBar.createShellLink(TaskBar.java:168)
+	at org.eclipse.swt.widgets.TaskBar.createShellLinkArray(TaskBar.java:208)
+	at org.eclipse.swt.widgets.TaskBar.setMenu(TaskBar.java:382)
+	at org.eclipse.swt.widgets.TaskItem.setMenu(TaskItem.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.setMenuOnTaskItem(TaskBarManager.java:121)
+	at org.eclipse.mylyn.commons.workbench.TaskBarManager$TaskBarMenuManager.update(TaskBarManager.java:112)
+	at org.eclipse.jface.action.MenuManager.update(MenuManager.java:673)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.addSystemTaskBarActions(TasksUiPlugin.java:479)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin.access$7(TasksUiPlugin.java:458)
+	at org.eclipse.mylyn.internal.tasks.ui.TasksUiPlugin$TasksUiInitializationJob.runInUIThread(TasksUiPlugin.java:394)
+	at org.eclipse.ui.progress.UIJob.lambda$0(UIJob.java:95)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:185)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4001)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3629)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1157)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1046)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:155)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:644)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:338)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:551)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:156)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:203)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:401)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:255)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:653)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:590)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1461)
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:45:50.894
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:45:51.025
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:48:46.770
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:48:46.877
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:49:32.275
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:49:32.381
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:50:58.012
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:50:58.119
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:55:19.758
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:55:19.869
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 5012 2022-01-02 00:55:26.496
+!MESSAGE Error in final launch sequence
+!STACK 1
+org.eclipse.core.runtime.CoreException: Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+	at org.eclipse.cdt.dsf.concurrent.Query.get(Query.java:112)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launchDebugSession(LaunchConfigurationDelegate.java:453)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launchDebugger(LaunchConfigurationDelegate.java:178)
+	at org.eclipse.embedcdt.debug.gdbjtag.openocd.core.dsf.LaunchConfigurationDelegate.launch(LaunchConfigurationDelegate.java:154)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:803)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:716)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1021)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$2.run(DebugUIPlugin.java:1224)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Contains: Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+java.lang.Exception: Remote communication error.  Target disconnected.: Not a directory.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+!SUBENTRY 1 org.eclipse.cdt.dsf 4 10004 2022-01-02 00:55:26.498
+!MESSAGE Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+!SUBENTRY 2 org.eclipse.cdt.dsf.gdb 4 10004 2022-01-02 00:55:26.498
+!MESSAGE Failed to execute MI command:
+load D:\\Embedded\\STM32_Repo\\Eclipse_WS\\Task3_LEDMatrix&IR\\Debug\\Task3_LEDMatrix&IR.elf
+Error message from debugger back end:
+Remote communication error.  Target disconnected.: Not a directory.
+!STACK 0
+java.lang.Exception: Remote communication error.  Target disconnected.: Not a directory.
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.processMIOutput(AbstractMIControl.java:1014)
+	at org.eclipse.cdt.dsf.mi.service.command.AbstractMIControl$RxThread.run(AbstractMIControl.java:843)
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:55:31.559
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 00:55:31.667
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:00:12.383
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:00:12.492
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:01:08.044
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:01:08.154
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:01:51.555
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:01:51.666
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:02:43.673
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:02:43.798
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:07:30.395
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:07:30.500
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:07:38.359
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:07:38.470
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:08:34.414
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:08:34.521
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:09:56.447
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:09:56.552
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:10:27.400
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:10:27.509
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:11:35.310
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:11:35.416
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:13:10.763
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:13:10.869
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:51:30.544
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@7eca7961): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:51:30.546
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@58c61cc9): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:51:30.547
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@5c2e166d): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:51:30.549
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@57a64ed5): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:54:10.616
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 01:54:10.725
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:04.446
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@62a05dbb): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:04.448
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@793bb352): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:04.449
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@5e7ce221): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:04.451
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@26691bcf): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:20.669
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@545ba462): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:20.671
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@7b2e6c64): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:20.672
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@3dc11c1): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:20.673
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@75b6aab7): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:52.613
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@7469b331): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:52.615
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@6e3965e7): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:52.616
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@531062): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:55:52.618
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@1956e938): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:56:27.891
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@e5c5dc8): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:56:27.893
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@41317275): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:56:27.894
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@4dc4dea6): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.cdt.dsf 4 10005 2022-01-02 01:56:27.896
+!MESSAGE Request for monitor: 'RequestMonitor (org.eclipse.cdt.dsf.concurrent.RequestMonitor@21b6724f): Status OK: unknown code=0 OK null' resulted in a rejected execution exception.
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 02:07:20.768
+!MESSAGE D:\Embedded\IMT_ARM\02-Tools_Novirus\03-Eclipse SDK\Good to Go\eclipse-embedcpp-2021-03-R-win32-x86_64\OpenOCD\bin/openocd.exe -c gdb_port 3333 -c telnet_port 4444 -c tcl_port 6666 -f board/stmIMTConfig.cfg -c echo "Started by GNU MCU Eclipse"
+
+!ENTRY org.eclipse.embedcdt.debug.gdbjtag.openocd.core 4 1 2022-01-02 02:07:20.880
+!MESSAGE arm-none-eabi-gdb --interpreter=mi2 --nx
