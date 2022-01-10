@@ -13,13 +13,49 @@
 
 extern volatile u8 global_u8IRFrameReceivedFlag;
 extern volatile u32 global_u32IRArrSignalTime[IR_MAXSIGNALBUFFER];
-
+extern volatile u8 global_u8IRIsStart,global_u8IRIsRepeat;
 
 #define NORMALMODE  (1)
 #define TESTMODE    (2)
 
 #define MODE (NORMALMODE)
 
+volatile u8 looptypestartflag=0;
+volatile u32 validdatacntr=0;
+u32 srcbuff[255]={13657,
+		1127,
+		1127,
+		1127,
+		1124,
+		1127,
+		1126,
+		1126,
+		1128,
+		2236,
+		2237,
+		2214,
+		2236,
+		2262,
+		2238,
+		2237,
+		2213,
+		2265,
+		1126,
+		2211,
+		1153,
+		1103,
+		1150,
+		2237,
+		1101,
+		1127,
+		2237,
+		1153,
+		2238,
+		2238,
+		2216,
+		1150,
+		2238};
+u32 testbuff[255]={0};
 
 #if MODE==TESTMODE
 
@@ -84,22 +120,102 @@ static void App_voidReadAndReactUpdated(u8* DataQ)
 //	return;
 
 
-	for(i=0;i<50;i++)
+	for(i=0;i<1;i++)
 	{
 		if(DataQ[i] != 0)
 		{
-			EXTI_voidMaskLine(MEXTI_1);
+			validdatacntr++;
+			//EXTI_voidMaskLine(MEXTI_1);
 
 			if(DataQ[i]==HIR_POWER)
-				HLEDMRX_voidDisplay(LEDMRX_P, 20000);
+			{
+				HLEDMRX_voidDisplay(LEDMRX_P, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_P, 48000);
+			}
 			else if(DataQ[i]==HIR_MODE)
-				HLEDMRX_voidDisplay(LEDMRX_M, 20000);
+			{
+				HLEDMRX_voidDisplay(LEDMRX_M, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_M, 48000);
+			}
+			else if(DataQ[i]==1)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_0, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_0, 48000);
+			}
+			else if(DataQ[i]==2)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_1, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_1, 48000);
+			}
+			else if(DataQ[i]==3)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_2, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_2, 48000);
+			}
+			else if(DataQ[i]==4)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_3, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_3, 48000);
+			}
+			else if(DataQ[i]==5)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_4, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_4, 48000);
+			}
+			else if(DataQ[i]==6)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_5, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_5, 48000);
+			}
+			else if(DataQ[i]==7)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_6, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_6, 48000);
+			}
+			else if(DataQ[i]==8)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_7, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_7, 48000);
+			}
+			else if(DataQ[i]==9)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_8, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_8, 48000);
+			}
+			else if(DataQ[i]==10)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_9, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_9, 48000);
+			}
+			else if(DataQ[i]==HIR_PLAY)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_Dance1, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_Dance1, 48000);
+			}
+			else if(DataQ[i]==HIR_REWIND)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_Dance2, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_Dance2, 48000);
+			}
+			else if(DataQ[i]==HIR_FORWARD)
+			{
+				HLEDMRX_voidDisplay(LEDMRX_Dance3, 60000);
+				HLEDMRX_voidDisplay(LEDMRX_Dance3, 48000);
+			}
 
+			else
+			{
+				MTIMR2to5_voidSetBusyWait(2,60000);
+				MTIMR2to5_voidSetBusyWait(2,48000);
+			}
 			DataQ[i]=0;
 
-			EXTI_voidUNMaskLine(MEXTI_1);
+			//EXTI_voidUNMaskLine(MEXTI_1);
 		}
+		if(validdatacntr>1)
+			asm("nop");
 	}
+	validdatacntr=0;
 
 
 	return;
@@ -120,18 +236,44 @@ void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
 	}
 }
 
+/*TODO:
+2-Timeout approach(we are HERE)
+ it has the following problem:
+ Q)it Checks after stoping getting EXTI for 110 ms so it ignores case of long press REPEAT  (we receive EXTI but no TIMEOUT ISR)
+ Ans)From app context if for 108+ms we didn't get (neither received data flag-raised in timeout ISR-
+		nor we received globalNotreceivedFlag -raised also in timeout ISR if it hits but no 33 frame where received- )
+		and we have ongoing MSTK_interval
+	 it means that we keep getting EXTI ISR but no TIMEOUT ISR i.e repeat state
+
+ Plan:
+1-from app context Get from timeout ISR following status:
+ 1.1)fired & DataReceived since last timeout (>=33)
+	1.1.1)GetFrame and act on it
+ 1.2)fired & DataReceived since last timeout(>2 && <33)
+ 	1.2.1)check if repeated frames and act on them
+ 1.3)fired & no data received since last timeout (<2)
+ 	1.3.1)No data received flag
+ 1.4)Not Fired & ONGOING MSTK interval
+ 1.5)Not fired and no ongoing MSTK interval
+2-Clean timeout ISR status after checking it from app context
+*/
+
+
+//Todo: Check
+/*this approach depend on fact that we will poll on start/repeat signal every < 1ms
+ * could be extended to 40ms or 67 depending on max least time between frames or depending
+ * on LEDMRX delay time
+ */
 
 void main()
 {
 	//This array to be removed after debugging and check on local var no need to array
 	u8 volatile DataFlagArr[50]={0};
-	u8 AddresQ,DataQ[50]={0},local_tempLastDataQ=0;
+	u8 AddresQ,DataQ[50]={0},local_u8GetDataFlag=0;
 	u8 j=0,i=0;
+	u8 volatile local_tempLastDataQ=0;
 
-
-
-	volatile u32 possibleframescounter=0,symbolcounter=0;
-
+	volatile u32 possibleframescounter=0,symbolcounter=0,local_u32msCounter=0,dbgloopcounter=0;
 
 	/*Enable HSE system clock*/
 	MRCC_voidInitSysClock();
@@ -157,302 +299,175 @@ void main()
 	MNVIC_voidInit();
 
 
-
-
-#if MODE==TESTMODE
-	global_u8IRFrameReceivedFlag=1;
-#endif
-	while(1)
-	{
-		if(global_u8IRFrameReceivedFlag)
-		{
-			while(1)
-			{
-			#if MODE==TESTMODE
-				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(testbuff, &AddresQ, &DataQ[j]);
-			#else
-				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(global_u32IRArrSignalTime, &AddresQ, &DataQ[j]);
-			#endif
-
-				if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA)
-				{
-					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
-					i++;
-					break;
-				}
-				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
-				{
-					/*Save Last Received Data*/
-					local_tempLastDataQ=DataQ[j];
-					App_voidReadAndReactUpdated(DataQ);
-					/*Break loop no data left*/
-					i++;
-					j++;
-					break;
-				}
-				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
-				{
-					/*Handle following cases:
-					 * 1-Case where last data received is still in buffer
-					 * 2-Case where we reseted DataQ and we received repeated signal
-					   (i.e First new data equals last data received before clearing buffer)*/
-					DataQ[j]=local_tempLastDataQ;
-					App_voidReadAndReactUpdated(DataQ);
-					/*Break loop no data left*/
-					i++;
-					j++;
-					break;
-				}
-				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
-				{
-					/*Handle following cases:
-					 * 1-Case where last data received is still in buffer
-					 * 2-Case where we reseted DataQ and we received repeated signal
-					   (i.e First new data equals last data received before clearing buffer)*/
-					DataQ[j]=local_tempLastDataQ;
-					App_voidReadAndReactUpdated(DataQ);
-					/*Don't Break loop keep getting data*/
-					i++;
-					j++;
-				}
-				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
-				{
-					/*Save Last Received Data*/
-					local_tempLastDataQ=DataQ[j];
-					App_voidReadAndReactUpdated(DataQ);
-					/*Don't Break loop keep getting data*/
-					i++;
-					j++;
-				}
-				else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
-					asm("nop");  //error
-
-
-				if(global_u8IRFrameReceivedFlag==0)
-				{
-					/*If Flag was Cleared after this means that flag was raised and we checked/extracted all buffer then we cleared flag*/
-					/*Impossible to get here as flag is cleared if we return emptybuf which is followed by break above*/
-					/*Make Your Routine HeRE*/
-					asm("nop");
-					//error
-					break;
-				}
-
-				if(i>49)
-				{
-					//we received more than 50 possible frames
-					possibleframescounter+=50;
-					//Reset buffer index
-					i=0;
-					/*Reset Buffer*/
-					vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
-				}
-				if(j>49)
-				{
-					//we stored more than 50 valid data symbol received
-					symbolcounter+=50;
-					/*Save Last Data Received to handle case if the next check data is repeated
-					 * [j-1] because we incremented j above*/
-					local_tempLastDataQ=DataQ[j-1];
-					//Reset DataQ index
-					j=0;
-					App_voidReadAndReactUpdated(DataQ);
-					/*Reset DataQbuffer*/
-					vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
-				}
-
-			}
-		}
-
-
-#if MODE==TESTMODE
-
-	if(k==2 && global_u8IRFrameReceivedFlag==0)
-	{
-		//for(i=0;i<IR_MAXSIGNALBUFFER;i++)
-			//testbuff[i]=testTargetBuff[i];
-
-		global_u8IRFrameReceivedFlag=1;
-	}
-#endif
-		if(i>49)
-		{
-			//we received more than 50 possible frames
-			possibleframescounter+=50;
-			//Reset buffer index
-			i=0;
-			/*Reset Buffer*/
-			vid_clearBuffer( (void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
-		}
-		if(j>49)
-		{
-			//we stored more than 50 valid data symbol received
-			symbolcounter+=50;
-			/*Save Last Data Received to handle case if the next check data is repeated
-			 * [j-1] because we incremented j above*/
-			local_tempLastDataQ=DataQ[j-1];
-			//Reset DataQ index
-			j=0;
-			App_voidReadAndReactUpdated(DataQ);
-			/*Reset DataQbuffer*/
-			vid_clearBuffer((void*)DataQ,(sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]));
-		}
-	}
-
-	//can't break the main while 1
-	asm("nop");
-
-
-
-
-
-
-
-
-
-
-
-#if 0
+volatile u32 dbgrepeatcntr=0, RepeatIncSeq=1;
 
 #if MODE==TESTMODE
 	global_u8IRFrameReceivedFlag=1;
 #endif
 	while(1)
 	{
-		if(global_u8IRFrameReceivedFlag)
+#if 1
+		if(global_u8IRIsStart)
 		{
+			global_u8IRIsStart=0;
+			do
+			{
+				MTIMR2to5_voidSetBusyWait(2, 1000);
+				local_u32msCounter++;
+			}while(local_u32msCounter<55);
+			local_u32msCounter=0;
+			local_u8GetDataFlag=1;
+			looptypestartflag=1;
+		}
+		else if(global_u8IRIsRepeat)
+		{
+			global_u8IRIsRepeat=0;
+			local_u8GetDataFlag=1;
+			dbgrepeatcntr++;
+		}
+
+		if(local_u8GetDataFlag)
+#endif
+#if 0
+		if(1)
+#endif
+		{
+			//Todo on current state we need two things
+			//1-Handle case if buffer is filled with good data but 110ms delay cause bad view
+			//2-Handle case of bad buffer why not getting data right.
+			//3-use timer context mehtod or use timer in exti interrupt to flag reception of some kind of frame
+			//4-use timer here as debug to check when holding remote what is interval between each flag set and other
+			//to make sure that repeat flag is set on time (as it is the most important one, as you cant press on button on/off faster than hold on it)
 			while(1)
 			{
-			#if MODE==TESTMODE
-				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(testbuff, &AddresQ, &DataQ[j]);
-			#else
-				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(global_u32IRArrSignalTime, &AddresQ, &DataQ[j]);
-			#endif
-#if 0
-				/*Disabled as no need to know if overflow occurs
-				 * because if overflow occurs the buffer overwrite itself from beginning
-				 */
-				if(DataFlagArr[i]==IR_DATA_OVERFLOWBUF )
-				{
-					/*Data Overflow occurred after receiving some data -as global_u8IRFrameReceivedFlag is only raised if no overflow occurs or it was raised and overflow occurred after that before clearing global_u8IRFrameReceivedFlag  */
-					overflowcounter ++;
-					global_irDataCounter=0;
-					global_irDataCounterRelative=0;
-					vid_clearBuffer((void*)global_u32IRArrSignalTime,sizeof(global_u32IRArrSignalTime)/sizeof(global_u32IRArrSignalTime[0]) ,sizeof(global_u32IRArrSignalTime[0]));
-					global_u8OverFlowFlag=0;
-					i++;
-					/*Clear global_u8IRFrameReceivedFlag*/
-					global_u8IRFrameReceivedFlag=0;
-					break;
-				}
-#endif
-				if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA)
-				{
-					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
-					i++;
-					break;
-				}
-				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
-				{
-					App_voidReadAndReact(DataQ, j);
-					i++;
-					j++;
-					break;
-				}
-				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
-				{
-					if(j>0)
+//				for(k=0;k<5;k++)
+//			//		MTIMR2to5_voidSetBusyWait(2, 10000);
+//				for(k=0;k<255;k++)
+//					testbuff[k]=srcbuff[k];
+
+				#if MODE==TESTMODE
+					DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(testbuff, &AddresQ, &DataQ[j]);
+				#else //global_u32IRArrSignalTime
+					DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(global_u32IRArrSignalTime, &AddresQ, &DataQ[j]);
+				#endif
+
+					if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA)
 					{
-						DataQ[j]=DataQ[j-1];
+						/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
+						i++;
+						break;
 					}
-					App_voidReadAndReact(DataQ, j);
-					i++;
-					j++;
-					break;
-				}
-				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
-				{
-					if(j>0)
+					else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
 					{
-						DataQ[j]=DataQ[j-1];
-						App_voidReadAndReact(DataQ, j);
+						/*Save Last Received Data*/
+						local_tempLastDataQ=DataQ[j];
+						App_voidReadAndReactUpdated(DataQ);
+						/*Break loop no data left*/
+						i++;
+						j++;
+						break;
+					}
+					else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
+					{
+						/*Handle following cases:
+						 * 1-Case where last data received is still in DataQ buffer
+						 * 2-Case where we reseted DataQ and we received repeated signal
+						   (i.e First new data equals last data received before clearing buffer)*/
+						DataQ[j]=local_tempLastDataQ;
+						//DataQ[j]=RepeatIncSeq%11;
+						//RepeatIncSeq++;
+						App_voidReadAndReactUpdated(DataQ);
+						/*Break loop no data left*/
+						i++;
+						j++;
+						break;
+					}
+					else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
+					{
+						/*Handle following cases:
+						 * 1-Case where last data received is still in buffer
+						 * 2-Case where we reseted DataQ and we received repeated signal
+						   (i.e First new data equals last data received before clearing buffer)*/
+						DataQ[j]=local_tempLastDataQ;
+						//DataQ[j]=RepeatIncSeq%11;
+						//RepeatIncSeq++;
+						App_voidReadAndReactUpdated(DataQ);
+						/*Don't Break loop keep getting data*/
 						i++;
 						j++;
 					}
-				}
-				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
-				{
-					App_voidReadAndReact(DataQ, j);
-					i++;
-					j++;
-				}
-				else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
-					asm("nop");
+					else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
+					{
+						/*Save Last Received Data*/
+						local_tempLastDataQ=DataQ[j];
+						App_voidReadAndReactUpdated(DataQ);
+						/*Don't Break loop keep getting data*/
+						i++;
+						j++;
+					}
+					else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
+						asm("nop");  //error
+
+					if(i>49)
+					{
+						//we received more than 50 possible frames
+						possibleframescounter+=50;
+						//Reset buffer index
+						i=0;
+						/*Reset Buffer*/
+						vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
+					}
+					if(j>0)
+					{
+						//we stored more than 50 valid data symbol received
+						symbolcounter+=50;
+						/*Save Last Data Received to handle case if the next check data is repeated
+						 * [j-1] because we incremented j above*/
+//						local_tempLastDataQ=DataQ[j-1];
+						//Reset DataQ index
+						j=0;
+						//App_voidReadAndReactUpdated(DataQ);
+						/*Reset DataQbuffer*/
+						vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
+					}
+					//loop counter for debugging
+					dbgloopcounter++;
+					if(dbgloopcounter>1)
+						asm("nop");
+				}//inner while1
+
+			local_u8GetDataFlag=0;
+#if 1
 
 
-				if(global_u8IRFrameReceivedFlag==0)
-				{
-					/*If Flag was Cleared after this means that flag was raised and we checked/extracted all buffer then we cleared flag*/
-					/*Impossible to get here as flag is cleaared if we return emptybuf which is followed by break above*/
-					/*Make Your Routine HeRE*/
-					asm("nop");
-					break;
-				}
-
-				if(i>49)
-				{
-					//we received more than 50 possible frames
-					possibleframescounter+=50;
-					//Reset buffer index
-					i=0;
-					/*Reset Buffer*/
-					vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
-				}
-				if(j>49)
-				{
-					//we stored more than 50 valid data symbol received
-					symbolcounter+=50;
-					//Reset DataQ index
-					j=0;
-					/*Reset DataQbuffer*/
-					vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
-				}
+			if(i>49)
+			{
+				//we received more than 50 possible frames
+				possibleframescounter+=50;
+				//Reset buffer index
+				i=0;
+				/*Reset Buffer*/
+				vid_clearBuffer( (void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
 			}
-		}
-
-
-#if MODE==TESTMODE
-
-	if(k==2 && global_u8IRFrameReceivedFlag==0)
-	{
-		//for(i=0;i<IR_MAXSIGNALBUFFER;i++)
-			//testbuff[i]=testTargetBuff[i];
-
-		global_u8IRFrameReceivedFlag=1;
-	}
+			if(j>0)
+			{
+				//we stored more than 50 valid data symbol received
+				symbolcounter+=50;
+				/*Save Last Data Received to handle case if the next check data is repeated
+				 * [j-1] because we incremented j above*/
+//				local_tempLastDataQ=DataQ[j-1];
+				//Reset DataQ index
+				j=0;
+				//App_voidReadAndReactUpdated(DataQ);
+				/*Reset DataQbuffer*/
+				vid_clearBuffer((void*)DataQ,(sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]));
+			}
 #endif
-		if(i>49)
-		{
-			//we received more than 50 possible frames
-			possibleframescounter+=50;
-			//Reset buffer index
-			i=0;
-			/*Reset Buffer*/
-			vid_clearBuffer( (void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
-		}
-		if(j>49)
-		{
-			//we stored more than 50 valid data symbol received
-			symbolcounter+=50;
-			//Reset DataQ index
-			j=0;
-			/*Reset DataQbuffer*/
-			vid_clearBuffer((void*)DataQ,(sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]));
-		}
-	}
 
+		}//if that triggers inner while(1)
+
+	}//main while(1)
 	//can't break the main while 1
 	asm("nop");
-#endif
 }
 

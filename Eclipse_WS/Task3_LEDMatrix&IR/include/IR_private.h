@@ -34,5 +34,6 @@ static u8 _u8InterpetBitFrameNEC(volatile u32* copy_u32PtrBit);
 static u8 _u8GetFrameData(volatile u32* copy_u32PtrBuffer,ir_type_index copy_start,u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData);
 static u8 _u8CheckFrameRepeat(volatile u32* copy_u32PtrFrame);
 
-
+static u8 _u8CheckFrameRepeat2nd(volatile u32* copy_u32PtrFrame);
+static void _voidClearu32BufferRange(u32*Buffer,u16 StartIndex,u16 Length);
 #endif
