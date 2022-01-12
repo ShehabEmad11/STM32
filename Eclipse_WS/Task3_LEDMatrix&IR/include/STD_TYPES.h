@@ -16,9 +16,10 @@ typedef unsigned short int  uint16;
 typedef unsigned long int   uint32;
 typedef signed char 		sint8;
 
-#define E_OK  		(1)
-#define E_NOT_OK	(0)
-#define TRUE		(1)
-#define FALSE		(0)
+#define NULL		((void*)(0))
+#define E_OK  		(1u)
+#define E_NOT_OK	(0u)
+#define TRUE		(1u)
+#define FALSE		(0u)
 #endif
 

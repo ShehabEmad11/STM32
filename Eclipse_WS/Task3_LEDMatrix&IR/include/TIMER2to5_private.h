@@ -11,6 +11,7 @@
 #include "BIT_MATH.h"
 
 
+
 typedef struct 
 {
 	volatile u32 CR1;
@@ -35,6 +36,8 @@ typedef struct
 	volatile u32 DMAR;
 }TIMx_t;  //create type
 
+#define TIMx_SINGLE_INTERVAL	(1)
+#define TIMx_PERIODIC_INTERVAL	(2)
 
 
 /*Casting address to a pointer to structure*/

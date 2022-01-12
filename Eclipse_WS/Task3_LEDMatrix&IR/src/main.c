@@ -303,6 +303,7 @@ void main()
 	u8 j=0,i=0;
 	volatile u16 local_u16msCounter;
 
+	u8 local_u8IsAlarmFired0=FALSE,local_u8IsAlarmFired1=FALSE,local_u8IsAlarmFired2=FALSE,local_u8IsAlarmFired3=FALSE,local_u8IsAlarmFired4=FALSE;
 
 	/*Enable HSE system clock*/
 	MRCC_voidInitSysClock();
@@ -328,6 +329,92 @@ void main()
 
 	MNVIC_voidInit();
 
+	MNVIC_voidEnableInterrupt(TIM2_NVICPOS);
+
+
+
+//TODO: handle alarms don't initialize time (needs to count relative)
+
+	/*Set Timer each 1ms*/
+	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 1000, MTIM2_voidCyclic1ms);
+
+	/*Set Alarm from timer2 context 0 for 5000ms)*/
+	MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , MTIMx_CONTEXT0, 30000);
+	MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , MTIMx_CONTEXT1, 60000);
+	MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , MTIMx_CONTEXT2, 90000);
+	MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , MTIMx_CONTEXT3, 120000);
+	MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , MTIMx_CONTEXT4, 150000);
+
+	while (1)
+	{
+		/*Check if Alarms Fired*/
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT0,&local_u8IsAlarmFired0))
+			break;
+
+		if(local_u8IsAlarmFired0==TRUE)
+		{
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT0);
+			local_u8IsAlarmFired0=FALSE;
+
+			MGPIO_voidTogglePin(GPIOA, PIN10);
+			asm("nop");
+		}
+
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT1,&local_u8IsAlarmFired1))
+			break;
+
+		if(local_u8IsAlarmFired1==TRUE)
+		{
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT1);
+			local_u8IsAlarmFired1=FALSE;
+
+			MGPIO_voidTogglePin(GPIOA, PIN10);
+			asm("nop");
+		}
+
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT2,&local_u8IsAlarmFired2))
+			break;
+
+		if(local_u8IsAlarmFired2==TRUE)
+		{
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT2);
+			local_u8IsAlarmFired2=FALSE;
+
+			MGPIO_voidTogglePin(GPIOA, PIN10);
+			asm("nop");
+		}
+
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT3,&local_u8IsAlarmFired3))
+			break;
+
+		if(local_u8IsAlarmFired3==TRUE)
+		{
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT3);
+			local_u8IsAlarmFired3=FALSE;
+
+			MGPIO_voidTogglePin(GPIOA, PIN10);
+			asm("nop");
+		}
+
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT4,&local_u8IsAlarmFired4))
+			break;
+
+		if(local_u8IsAlarmFired4==TRUE)
+		{
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT4);
+			local_u8IsAlarmFired4=FALSE;
+
+			MGPIO_voidTogglePin(GPIOA, PIN10);
+			asm("nop");
+		}
+	}
+
+
+
+
+
+
+#if 0
 	while(1)
 	{
 		/*Keep pooling to check if valid start is received*/
@@ -458,5 +545,7 @@ void main()
 		App_voidReadAndReact(DataQ);
 	}//main while(1)
 	asm("nop"); 	//can't break the main while 1
+#endif
+
 }
 
