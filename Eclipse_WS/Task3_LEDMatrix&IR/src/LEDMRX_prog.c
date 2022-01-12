@@ -184,6 +184,97 @@ extern void HLEDMRX_voidDisableAllColumn(void)
 	}
 }
 
+
+
+static HLEDMRX_enuStatus LEDMRX_Status=HLEDMRX_STATUS_FREE;
+
+extern HLEDMRX_enuStatus HLEDMRX_GetDisplayStatus(void)
+{
+	return(LEDMRX_Status);
+}
+
+extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
+{
+#define STATUS_NODELAY 				(0)
+#define STATUS_DELAY				(1)
+#define LEDMRX_CONTEXT		(MTIMx_CONTEXT0)
+
+	static uint8 DisplayingDelayStatus=STATUS_NODELAY;
+	static uint8 i,breakflag;
+	static uint32 local_u32NumOfDisplayTimes;
+	uint8 j,local_u8IsCurrDelayAlarmFired=FALSE;
+
+	LEDMRX_Status=HLEDMRX_STATUS_BUSY;
+
+	if(DisplayingDelayStatus==STATUS_NODELAY)
+	{
+		/*if no going display operations,calculate number of times to display any char on LEDMRX (note that 20,000Ms (20ms) is the minimum Display time*/
+		local_u32NumOfDisplayTimes = copy_u32DisplayTime / HLEDMRX_MIN_DISPLAY_TIME;
+		i=0;
+		breakflag=0;
+	}
+	else if(DisplayingDelayStatus==STATUS_DELAY)
+	{
+		/*Check if Alarms Fired*/
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , LEDMRX_CONTEXT,&local_u8IsCurrDelayAlarmFired))
+			return;
+
+		if(local_u8IsCurrDelayAlarmFired==FALSE)
+			return;
+
+		/*if we are here then alarm is fired*/
+		/*Clear Alarm*/
+		TIMx_u8ClrAlarmFired(MTIMER_2 , LEDMRX_CONTEXT);
+		local_u8IsCurrDelayAlarmFired=FALSE;
+		DisplayingDelayStatus=STATUS_NODELAY;
+		breakflag=0;
+		i++;
+//		MGPIO_voidTogglePin(GPIOA, PIN10);
+		asm("nop");
+	}
+
+	while(local_u32NumOfDisplayTimes>0)
+	{
+		while(i<HLEDMRX_COLUMNDIMENSION)
+		{
+			HLEDMRX_voidDisableAllColumn();
+			HLEDMRX_voidDisableAllRow();
+			HLEDMRX_voidEnableColumn(i);
+			for(j=0;j<HLEDMRX_ROWDIMENSION;j++)
+			{
+				if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_HIGH)
+					HLEDMRX_voidEnableRow(j);
+				else if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_LOW)
+					HLEDMRX_voidDisableRow(j);
+				else;/*Error*/
+			}
+			/*Max timer input is 65536 (u16 register)
+			 * Min Time for human eye and brain to realize is 2.5ms*/
+			//MTIMR2to5_voidSetBusyWait(2,2500);
+			/*Set Alarm from timer2 context 0 for 3ms)*/
+			MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , LEDMRX_CONTEXT, 3);
+
+			DisplayingDelayStatus=STATUS_DELAY;
+			breakflag=1;
+			break;
+			/* i will be incremented after delay checked in the next functional call*/
+//			local_u32Counter+=2500;
+		}
+		if(breakflag)
+			break;
+
+		local_u32NumOfDisplayTimes--;
+		i=0;
+	}
+	if(breakflag)
+		return;
+
+	HLEDMRX_voidDisableAllColumn();
+	HLEDMRX_voidDisableAllRow();
+	LEDMRX_Status=HLEDMRX_STATUS_FREE;
+}
+
+
 extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
 {
 	u8 i,j;

@@ -39,6 +39,7 @@ typedef struct
 #define TIMx_SINGLE_INTERVAL	(1)
 #define TIMx_PERIODIC_INTERVAL	(2)
 
+static void _voidCountAndFireAlarms(void);
 
 /*Casting address to a pointer to structure*/
 #define MTIM2 ((volatile TIMx_t *)(0x40000000))

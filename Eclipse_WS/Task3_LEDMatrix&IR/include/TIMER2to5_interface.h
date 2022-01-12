@@ -14,7 +14,7 @@ extern void MTIMR2to5_voidSetBusyWait(u8 copy_u8TimerNumber,u16 copy_u16Delay);
 extern void MTIMR2to5_voidSetTimerSingle(u8 copy_u8TimerNumber,u16 copy_u16Delay,void (*copy_Ptr2CallBack)(void));
 
 extern void MTIMR2to5_voidSetTimerPeriodic(u8 copy_u8TimerNumber,u16 copy_u16Delay,void (*copy_Ptr2CallBack)(void));
-extern void MTIM2_voidCyclic1ms();
+extern void MTIM2_voidCyclic1ms(void);
 
 
 extern void MTIMR2to5_voidSetAlarm_ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u32 copy_u32msVal);

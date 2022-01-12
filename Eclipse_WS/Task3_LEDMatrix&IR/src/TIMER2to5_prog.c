@@ -268,7 +268,7 @@ extern u8 TIMx_u8ClrAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber)
 	return E_OK;
 }
 
-extern void MTIM2_voidCyclic1ms()
+extern void MTIM2_voidCyclic1ms(void)
 {
 	_voidCountAndFireAlarms();
 }
