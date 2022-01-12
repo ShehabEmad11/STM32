@@ -11,52 +11,14 @@
 #include "LEDMRX_database.h"
 #include "IR_config.h"
 
-extern volatile u8 global_u8IRFrameReceivedFlag;
-extern volatile u32 global_u32IRArrSignalTime[IR_MAXSIGNALBUFFER];
-extern volatile u8 global_u8IRIsStart,global_u8IRIsRepeat;
+#define APP_HAMADABALL	(1)
+#define APP_TEXTDISP	(2)
+#define APPLICATION		APP_TEXTDISP
 
-#define NORMALMODE  (1)
-#define TESTMODE    (2)
+uint8 AppPlayFlag=0;
 
-#define MODE (NORMALMODE)
-
-volatile u8 looptypestartflag=0;
-volatile u32 validdatacntr=0;
-u32 srcbuff[255]={13657,
-		1127,
-		1127,
-		1127,
-		1124,
-		1127,
-		1126,
-		1126,
-		1128,
-		2236,
-		2237,
-		2214,
-		2236,
-		2262,
-		2238,
-		2237,
-		2213,
-		2265,
-		1126,
-		2211,
-		1153,
-		1103,
-		1150,
-		2237,
-		1101,
-		1127,
-		2237,
-		1153,
-		2238,
-		2238,
-		2216,
-		1150,
-		2238};
-u32 testbuff[255]={0};
-
+#define MODE 0
+#define TESTMODE 5
 #if MODE==TESTMODE
 
 #define EFRAME 			13754, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270, 2246, 2271, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220
@@ -68,156 +30,236 @@ u32 testbuff[255]={0};
 	volatile u32 testbuff[IR_MAXSIGNALBUFFER]={EFRAME,MFRAME,0,0,0};
 	volatile u32 testTargetBuff[IR_MAXSIGNALBUFFER]={EFRAME,MFRAME,EFRAME,MFRAME,EFRAME};
 	u8 testDataQ[]={'E',HIR_MODE,'E',HIR_MODE,0,HIR_MODE};
+
+	u32 srcbuff[255]={13657,
+			1127,
+			1127,
+			1127,
+			1124,
+			1127,
+			1126,
+			1126,
+			1128,
+			2236,
+			2237,
+			2214,
+			2236,
+			2262,
+			2238,
+			2237,
+			2213,
+			2265,
+			1126,
+			2211,
+			1153,
+			1103,
+			1150,
+			2237,
+			1101,
+			1127,
+			2237,
+			1153,
+			2238,
+			2238,
+			2216,
+			1150,
+			2238};
+	u32 testbuff[255]={0};
+
 #endif
 
+
+
+
+static void App_voidReadAndReact(u8* DataQ)
+{
+#define PAUSE (0u)
+#define PLAY  (1u)
+
+	static uint32 rewindcounter=0;
+	static uint8 local_u8PlayState=PAUSE;
+	static uint32 local_u32SpeedDelay=100000,local_u32ShiftSpeedDelay=600000;
+
+	switch(*DataQ)
+	{
+	case HIR_POWER:
+		/*multiples of 20,000*/
+		HLEDMRX_voidDisplayShifting(LEDMRX_P, 320000);
+		break;
+
+	case HIR_MODE:
+		/*multiples of 20,000*/
+		HLEDMRX_voidDisplay(LEDMRX_M, 100000);
+		break;
+
+	case HIR_PLAY_PAUSE:
+		local_u8PlayState ^= 1;
+		if(local_u8PlayState==PLAY)
+			AppPlayFlag=1;
+		else
+			AppPlayFlag=0;
+		break;
+
+	case HIR_REWIND:
+		rewindcounter++;
+#if APPLICATION==APP_HAMADABALL
+		if(local_u32SpeedDelay<160000)
+		{
+			local_u32SpeedDelay+=20000;
+//			HLEDMRX_voidDisplay(LEDMRX_SMinus,100000);
+		}
+#elif APPLICATION==APP_TEXTDISP
+		if(local_u32ShiftSpeedDelay<800000)
+		{
+			local_u32ShiftSpeedDelay+=100000;
+//			HLEDMRX_voidDisplay(LEDMRX_SMinus,100000);
+		}
+#endif
+		else
+		{
+			asm("nop");
+		}
+		/*multiples of 20,000*/
+//		HLEDMRX_voidDisplay(LEDMRX_Dance2, 100000);
+		break;
+
+	case HIR_FORWARD:
+#if APPLICATION==APP_HAMADABALL
+		if(local_u32SpeedDelay>40000)
+		{
+			local_u32SpeedDelay-=20000;
+//			HLEDMRX_voidDisplay(LEDMRX_SPlus,100000);
+		}
+#elif APPLICATION==APP_TEXTDISP
+		if(local_u32ShiftSpeedDelay>400000)
+		{
+			local_u32ShiftSpeedDelay-=100000;
+//			HLEDMRX_voidDisplay(LEDMRX_SPlus,100000);
+		}
+#endif
+		else
+		{
+			asm("nop");
+		}
+
+		/*multiples of 20,000*/
+//		HLEDMRX_voidDisplay(LEDMRX_Dance3, 100000);
+		break;
+
+
+
+	case HIR_EQUALIZER:
+		/*multiples of 20,000*/
+		HLEDMRX_voidDisplay(LEDMRX_Ball0, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_Ball1, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_Ball2, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_Ball3, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall1, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall2, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall3, 100000);
+
+		break;
+
+	case HIR_VOLDOWN:
+		/*multiples of 20,000*/
+		HLEDMRX_voidDisplay(LEDMRX_Ball3, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall1, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall2, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall3, 100000);
+
+		break;
+
+	case HIR_VOLUP:
+		/*multiples of 20,000*/
+		HLEDMRX_voidDisplay(LEDMRX_Ball0, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_Ball1, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_Ball2, 100000);
+		HLEDMRX_voidDisplay(LEDMRX_Ball3, 100000);
+
+
+		break;
+
+	case HIR_ZERO:
+		/*multiples of 20,000*/
+		HLEDMRX_voidDisplay(LEDMRX_0, 100000);
+		break;
 
 #if 0
-	volatile u8 ToBeRepresented[40]={0};
-	u8 k=0;
+	case 0:
+		HLEDMRX_voidDisplay(LEDMRX_0, 100000);
+		break;
 
-static void App_voidReadAndReact(u8* DataQ,u8 indexx)
-{
-	static u8 LastData;
+	case 1:
+		HLEDMRX_voidDisplay(LEDMRX_1, 100000);
+		break;
 
-	if(indexx != 0)
-	{
-		if(DataQ[indexx] != LastData)
-		{
-			if(DataQ[indexx]==HIR_POWER)
-				HLEDMRX_voidDisplay(LEDMRX_P, 250000);
-			else if(DataQ[indexx]==HIR_MODE)
-				HLEDMRX_voidDisplay(LEDMRX_M, 250000);
+	case 2:
+		HLEDMRX_voidDisplay(LEDMRX_2, 100000);
+		break;
 
-			ToBeRepresented[k++]=DataQ[indexx];
-		}
-	}
-	else if (indexx==0)
-	{
-		if(DataQ[indexx]==HIR_POWER)
-			HLEDMRX_voidDisplay(LEDMRX_P, 250000);
-		else if(DataQ[indexx]==HIR_MODE)
-			HLEDMRX_voidDisplay(LEDMRX_M, 250000);
+	case 3:
+		HLEDMRX_voidDisplay(LEDMRX_3, 100000);
+		break;
 
-		ToBeRepresented[k++]=DataQ[indexx];
-	}
+	case 4:
+		HLEDMRX_voidDisplay(LEDMRX_4, 100000);
+		break;
 
-	LastData=DataQ[indexx];
+	case 5:
+		HLEDMRX_voidDisplay(LEDMRX_5, 100000);
+		break;
 
-	if(k>=40)
-	{
-		k=0;
-	}
+	case 6:
+		HLEDMRX_voidDisplay(LEDMRX_6, 100000);
+		break;
 
+	case 7:
+		HLEDMRX_voidDisplay(LEDMRX_7, 100000);
+		break;
 
-}
+	case 8:
+		HLEDMRX_voidDisplay(LEDMRX_8, 100000);
+		break;
+
+	case 9:
+		HLEDMRX_voidDisplay(LEDMRX_9, 100000);
+		break;
 #endif
 
-
-static void App_voidReadAndReactUpdated(u8* DataQ)
-{
-	u8 i;
-//	HLEDMRX_voidDisplay(LEDMRX_O, 200000);
-//	return;
-
-
-	for(i=0;i<1;i++)
-	{
-		if(DataQ[i] != 0)
-		{
-			validdatacntr++;
-			//EXTI_voidMaskLine(MEXTI_1);
-
-			if(DataQ[i]==HIR_POWER)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_P, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_P, 48000);
-			}
-			else if(DataQ[i]==HIR_MODE)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_M, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_M, 48000);
-			}
-			else if(DataQ[i]==1)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_0, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_0, 48000);
-			}
-			else if(DataQ[i]==2)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_1, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_1, 48000);
-			}
-			else if(DataQ[i]==3)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_2, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_2, 48000);
-			}
-			else if(DataQ[i]==4)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_3, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_3, 48000);
-			}
-			else if(DataQ[i]==5)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_4, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_4, 48000);
-			}
-			else if(DataQ[i]==6)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_5, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_5, 48000);
-			}
-			else if(DataQ[i]==7)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_6, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_6, 48000);
-			}
-			else if(DataQ[i]==8)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_7, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_7, 48000);
-			}
-			else if(DataQ[i]==9)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_8, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_8, 48000);
-			}
-			else if(DataQ[i]==10)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_9, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_9, 48000);
-			}
-			else if(DataQ[i]==HIR_PLAY)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_Dance1, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_Dance1, 48000);
-			}
-			else if(DataQ[i]==HIR_REWIND)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_Dance2, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_Dance2, 48000);
-			}
-			else if(DataQ[i]==HIR_FORWARD)
-			{
-				HLEDMRX_voidDisplay(LEDMRX_Dance3, 60000);
-				HLEDMRX_voidDisplay(LEDMRX_Dance3, 48000);
-			}
-
-			else
-			{
-				MTIMR2to5_voidSetBusyWait(2,60000);
-				MTIMR2to5_voidSetBusyWait(2,48000);
-			}
-			DataQ[i]=0;
-
-			//EXTI_voidUNMaskLine(MEXTI_1);
-		}
-		if(validdatacntr>1)
-			asm("nop");
+	default:
+	//	HLEDMRX_voidDisplay(LEDMRX_Ball0, 100000);
+	//	MTIMR2to5_voidSetBusyWait(2,60000);
+	//	MTIMR2to5_voidSetBusyWait(2,40000);
+		break;
 	}
-	validdatacntr=0;
+	*DataQ=0;
 
-
+#if APPLICATION==APP_HAMADABALL
+	if(AppPlayFlag)
+	{
+		HLEDMRX_voidDisplay(LEDMRX_Ball0,  	  (uint32)local_u32SpeedDelay);
+		HLEDMRX_voidDisplay(LEDMRX_Ball1,	  (uint32)local_u32SpeedDelay);
+		HLEDMRX_voidDisplay(LEDMRX_Ball2,	  (uint32)local_u32SpeedDelay);
+		HLEDMRX_voidDisplay(LEDMRX_Ball3, 	  (uint32)local_u32SpeedDelay);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall1, (uint32)local_u32SpeedDelay);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall2, (uint32)local_u32SpeedDelay);
+		HLEDMRX_voidDisplay(LEDMRX_BallFall3, (uint32)local_u32SpeedDelay);
+	}
+#elif APPLICATION==APP_TEXTDISP
+	if(AppPlayFlag)
+	{
+		HLEDMRX_voidDisplayShifting(LEDMRX_I,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_L,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_O,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_V,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_E,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_Y,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_O,(uint32)local_u32ShiftSpeedDelay);
+		HLEDMRX_voidDisplayShifting(LEDMRX_U,(uint32)local_u32ShiftSpeedDelay);
+	}
+#endif
+	//TODO: to be added when triggering accurate timings
+	//MTIMR2to5_voidSetBusyWait(2,8000);
 	return;
 }
 
@@ -236,44 +278,31 @@ void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
 	}
 }
 
-/*TODO:
-2-Timeout approach(we are HERE)
- it has the following problem:
- Q)it Checks after stoping getting EXTI for 110 ms so it ignores case of long press REPEAT  (we receive EXTI but no TIMEOUT ISR)
- Ans)From app context if for 108+ms we didn't get (neither received data flag-raised in timeout ISR-
-		nor we received globalNotreceivedFlag -raised also in timeout ISR if it hits but no 33 frame where received- )
-		and we have ongoing MSTK_interval
-	 it means that we keep getting EXTI ISR but no TIMEOUT ISR i.e repeat state
 
- Plan:
-1-from app context Get from timeout ISR following status:
- 1.1)fired & DataReceived since last timeout (>=33)
-	1.1.1)GetFrame and act on it
- 1.2)fired & DataReceived since last timeout(>2 && <33)
- 	1.2.1)check if repeated frames and act on them
- 1.3)fired & no data received since last timeout (<2)
- 	1.3.1)No data received flag
- 1.4)Not Fired & ONGOING MSTK interval
- 1.5)Not fired and no ongoing MSTK interval
-2-Clean timeout ISR status after checking it from app context
-*/
-
-
-//Todo: Check
-/*this approach depend on fact that we will poll on start/repeat signal every < 1ms
- * could be extended to 40ms or 67 depending on max least time between frames or depending
- * on LEDMRX delay time
+/*USED APPROACH:
+ The following assumptions and info are used regarding the IR frames reception
+ 1)We received new frame which takes 67.5ms(from start to end)
+ 2)We received a repeated frame which takes 108ms (if we hold press on key)
+ 3)we couldn't receive more than 1 frame in <108ms
+ So From app context we check if:
+ * 1)a valid start of IR frame is received then:
+  	 1.1)since valid start is 13.5ms and whole frame is 67.5ms then we wait
+  	     for 55ms and then read the received frame
+  	 1.2)React on received frame if valid by displaying it for 108ms
+ * 2)a valid repeat of IR frame is received
+ * 	 2.1)then frame is already received we don't need to wait and we read it
+ * 	 2.2)act on it by displaying it for 108ms
  */
 
-void main()
-{
-	//This array to be removed after debugging and check on local var no need to array
-	u8 volatile DataFlagArr[50]={0};
-	u8 AddresQ,DataQ[50]={0},local_u8GetDataFlag=0;
-	u8 j=0,i=0;
-	u8 volatile local_tempLastDataQ=0;
 
-	volatile u32 possibleframescounter=0,symbolcounter=0,local_u32msCounter=0,dbgloopcounter=0;
+void main()
+ {
+	//This array to be removed after debugging and check on local var no need to array
+	u8 volatile DataFlagArr[50]={0},local_tempLastDataQ=0;
+	u8 AddresQ,DataQ[1]={0},local_u8ExtractIRDataFlag=0;
+	u8 j=0,i=0;
+	volatile u16 local_u16msCounter;
+
 
 	/*Enable HSE system clock*/
 	MRCC_voidInitSysClock();
@@ -288,6 +317,7 @@ void main()
 	MRCC_voidEnableClock(MRCC_APB1,0);
 
 	MSTK_voidInit();
+
 	MTIMR2to5_voidInit(MTIMER_2, 7);
 
 	MGPIO_voidSetPinDirection(GPIOA,PIN10, OUTPUT_SPEED_2MHZ_PP);
@@ -298,152 +328,119 @@ void main()
 
 	MNVIC_voidInit();
 
-
-volatile u32 dbgrepeatcntr=0, RepeatIncSeq=1;
-
-#if MODE==TESTMODE
-	global_u8IRFrameReceivedFlag=1;
-#endif
 	while(1)
 	{
-#if 1
-		if(global_u8IRIsStart)
+		/*Keep pooling to check if valid start is received*/
+		if(HIR_u8GetIsStart())
 		{
-			global_u8IRIsStart=0;
+			HIR_voidClrIsStart();
 			do
 			{
+				/*Wait for 55ms*/
 				MTIMR2to5_voidSetBusyWait(2, 1000);
-				local_u32msCounter++;
-			}while(local_u32msCounter<55);
-			local_u32msCounter=0;
-			local_u8GetDataFlag=1;
-			looptypestartflag=1;
+				local_u16msCounter++;
+			}while(local_u16msCounter<55);
+			local_u16msCounter=0;
+			local_u8ExtractIRDataFlag=1;
 		}
-		else if(global_u8IRIsRepeat)
+		/*Keep pooling to check if valid Repeat is received*/
+		else if(HIR_u8GetIsRepeat())
 		{
-			global_u8IRIsRepeat=0;
-			local_u8GetDataFlag=1;
-			dbgrepeatcntr++;
+			/*Clear Flag*/
+			HIR_voidClrIsRepeat();
+			local_u8ExtractIRDataFlag=1;
 		}
 
-		if(local_u8GetDataFlag)
-#endif
-#if 0
-		if(1)
-#endif
+		if(local_u8ExtractIRDataFlag)
 		{
-			//Todo on current state we need two things
-			//1-Handle case if buffer is filled with good data but 110ms delay cause bad view
-			//2-Handle case of bad buffer why not getting data right.
-			//3-use timer context mehtod or use timer in exti interrupt to flag reception of some kind of frame
-			//4-use timer here as debug to check when holding remote what is interval between each flag set and other
-			//to make sure that repeat flag is set on time (as it is the most important one, as you cant press on button on/off faster than hold on it)
 			while(1)
 			{
-//				for(k=0;k<5;k++)
-//			//		MTIMR2to5_voidSetBusyWait(2, 10000);
-//				for(k=0;k<255;k++)
-//					testbuff[k]=srcbuff[k];
+				/*Read Raw signals and extract Pure Data*/
+				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(&AddresQ, &DataQ[j]);
 
-				#if MODE==TESTMODE
-					DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(testbuff, &AddresQ, &DataQ[j]);
-				#else //global_u32IRArrSignalTime
-					DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(global_u32IRArrSignalTime, &AddresQ, &DataQ[j]);
-				#endif
+				if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA)
+				{
+					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
+					i++;
+					break;
+				}
+				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
+				{
+					/*Save Last Received Data*/
+					local_tempLastDataQ=DataQ[j];
+					App_voidReadAndReact(DataQ);
+					/*Break loop no data left*/
+					i++;
+					j++;
+					break;
+				}
+				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
+				{
+					/*Handle following cases:
+					 * 1-Case where last data received is still in DataQ buffer
+					 * 2-Case where we reseted DataQ and we received repeated signal
+					   (i.e First new data equals last data received before clearing buffer)*/
+					DataQ[j]=local_tempLastDataQ;
+					/*Ignore repeated*/
+					//TODO:Handle repeated
+					DataQ[j]=0;
+					//DataQ[j]=RepeatIncSeq%11;
+					//RepeatIncSeq++;
+					App_voidReadAndReact(DataQ);
+					/*Break loop no data left*/
+					i++;
+					j++;
+					break;
+				}
+				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
+				{
+					/*Handle following cases:
+					 * 1-Case where last data received is still in buffer
+					 * 2-Case where we reseted DataQ and we received repeated signal
+					   (i.e First new data equals last data received before clearing buffer)*/
+					DataQ[j]=local_tempLastDataQ;
+					/*Ignore repeated*/
+					//TODO:Handle repeated
+					DataQ[j]=0;
+					//DataQ[j]=RepeatIncSeq%11;
+					//RepeatIncSeq++;
+					App_voidReadAndReact(DataQ);
+					/*Don't Break loop keep getting data*/
+					i++;
+					j++;
+				}
+				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
+				{
+					/*Save Last Received Data*/
+					local_tempLastDataQ=DataQ[j];
+					App_voidReadAndReact(DataQ);
+					/*Don't Break loop keep getting data*/
+					i++;
+					j++;
+				}
+				else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
+					asm("nop");  //error
 
-					if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA)
-					{
-						/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
-						i++;
-						break;
-					}
-					else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
-					{
-						/*Save Last Received Data*/
-						local_tempLastDataQ=DataQ[j];
-						App_voidReadAndReactUpdated(DataQ);
-						/*Break loop no data left*/
-						i++;
-						j++;
-						break;
-					}
-					else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
-					{
-						/*Handle following cases:
-						 * 1-Case where last data received is still in DataQ buffer
-						 * 2-Case where we reseted DataQ and we received repeated signal
-						   (i.e First new data equals last data received before clearing buffer)*/
-						DataQ[j]=local_tempLastDataQ;
-						//DataQ[j]=RepeatIncSeq%11;
-						//RepeatIncSeq++;
-						App_voidReadAndReactUpdated(DataQ);
-						/*Break loop no data left*/
-						i++;
-						j++;
-						break;
-					}
-					else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
-					{
-						/*Handle following cases:
-						 * 1-Case where last data received is still in buffer
-						 * 2-Case where we reseted DataQ and we received repeated signal
-						   (i.e First new data equals last data received before clearing buffer)*/
-						DataQ[j]=local_tempLastDataQ;
-						//DataQ[j]=RepeatIncSeq%11;
-						//RepeatIncSeq++;
-						App_voidReadAndReactUpdated(DataQ);
-						/*Don't Break loop keep getting data*/
-						i++;
-						j++;
-					}
-					else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
-					{
-						/*Save Last Received Data*/
-						local_tempLastDataQ=DataQ[j];
-						App_voidReadAndReactUpdated(DataQ);
-						/*Don't Break loop keep getting data*/
-						i++;
-						j++;
-					}
-					else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
-						asm("nop");  //error
+				if(i>49)
+				{
+					//Reset buffer index
+					i=0;
+					/*Reset Buffer*/
+					vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
+				}
+				if(j>0)
+				{
+					//Reset DataQ index
+					j=0;
+					/*Reset DataQbuffer*/
+					vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
+				}
+			}//inner while1
 
-					if(i>49)
-					{
-						//we received more than 50 possible frames
-						possibleframescounter+=50;
-						//Reset buffer index
-						i=0;
-						/*Reset Buffer*/
-						vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
-					}
-					if(j>0)
-					{
-						//we stored more than 50 valid data symbol received
-						symbolcounter+=50;
-						/*Save Last Data Received to handle case if the next check data is repeated
-						 * [j-1] because we incremented j above*/
-//						local_tempLastDataQ=DataQ[j-1];
-						//Reset DataQ index
-						j=0;
-						//App_voidReadAndReactUpdated(DataQ);
-						/*Reset DataQbuffer*/
-						vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
-					}
-					//loop counter for debugging
-					dbgloopcounter++;
-					if(dbgloopcounter>1)
-						asm("nop");
-				}//inner while1
-
-			local_u8GetDataFlag=0;
-#if 1
-
+			local_u8ExtractIRDataFlag=0;
 
 			if(i>49)
 			{
-				//we received more than 50 possible frames
-				possibleframescounter+=50;
 				//Reset buffer index
 				i=0;
 				/*Reset Buffer*/
@@ -451,23 +448,15 @@ volatile u32 dbgrepeatcntr=0, RepeatIncSeq=1;
 			}
 			if(j>0)
 			{
-				//we stored more than 50 valid data symbol received
-				symbolcounter+=50;
-				/*Save Last Data Received to handle case if the next check data is repeated
-				 * [j-1] because we incremented j above*/
-//				local_tempLastDataQ=DataQ[j-1];
 				//Reset DataQ index
 				j=0;
-				//App_voidReadAndReactUpdated(DataQ);
 				/*Reset DataQbuffer*/
 				vid_clearBuffer((void*)DataQ,(sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]));
 			}
-#endif
+		}//condition checks for valid data
 
-		}//if that triggers inner while(1)
-
+		App_voidReadAndReact(DataQ);
 	}//main while(1)
-	//can't break the main while 1
-	asm("nop");
+	asm("nop"); 	//can't break the main while 1
 }
 

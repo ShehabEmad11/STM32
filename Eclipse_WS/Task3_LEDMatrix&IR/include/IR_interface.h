@@ -37,8 +37,16 @@ enum IR_DATAEXTRACTION_RESULT
 extern void HIR_voidEnable(u8 copy_u8ExtiLine,u8 copy_u8ExtiPort);
 extern void HIR_voidReceiveFrameNEC(void);
 extern u8 HIR_u8FrameCheckNEC(ir_type_index copy_u8FrameStartIndex,volatile u32* copy_u32PtrFrameBuffer);
-extern u8 HIR_u8ExtractDataFromBuffer(volatile u32* copy_u32PtrBuffer,u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData);
-extern void HIR_voidResetFrameBuffer(void);
+extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData);
 
+/*Interfaces to Read/Reset Signal buffer which stores time of each signal*/
+extern u8 HIR_u8ReadRawSignalBuffer(u32* DestArr);
+extern void HIR_voidResetRawSignalBuffer(void);
+
+/*Interfaces to check/clear frame's start or repeated frame is received*/
+extern void HIR_voidClrIsStart(void);
+extern void HIR_voidClrIsRepeat(void);
+extern u8 HIR_u8GetIsStart(void);
+extern u8 HIR_u8GetIsRepeat(void);
 
 #endif

@@ -43,5 +43,5 @@
 #define COLUMNPINS						 CATHODEPINS
 #endif
 
-
+#define MIN_NUMOFSHIFTS					 HLEDMRX_COLUMNDIMENSION
 #endif

@@ -11,8 +11,7 @@
 
 
 #define IR_MAXSIGNALBUFFER			(255u)
-#define IR_CONTEXT_TIMEOUT			(0)
-#define IR_CONTEXT_CONTPRESS		(1)
+
 
 #if IR_MAXSIGNALBUFFER<=255
 	typedef u8 ir_type_index;
@@ -25,7 +24,6 @@
 
 enum IR_FRAMESTATUS {IR_FRAMESTATUS_INVALID,IR_FRAMESTATUS_VALID,IR_FRAMESTATUS_REPEATED};
 
-static void _voidReceptionHandler(u8 Context);
 static void _voidTimeOutHandler(void);
 static void _voidCopyFrame(u32* Dest,u32 *Src,u8 SrcStartIndex);
 static u8 _u8CheckSubFrameInversion(ir_type_index copy_u8Start,volatile u32* copy_u32PtrFrame);
@@ -33,7 +31,11 @@ static u8 _u8CheckFrameStart(ir_type_index copy_u8Start,volatile u32* copy_u32Pt
 static u8 _u8InterpetBitFrameNEC(volatile u32* copy_u32PtrBit);
 static u8 _u8GetFrameData(volatile u32* copy_u32PtrBuffer,ir_type_index copy_start,u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData);
 static u8 _u8CheckFrameRepeat(volatile u32* copy_u32PtrFrame);
-
-static u8 _u8CheckFrameRepeat2nd(volatile u32* copy_u32PtrFrame);
+static u8 _u8CheckFrameRepeatEnd(volatile u32* copy_u32PtrFrame);
 static void _voidClearu32BufferRange(u32*Buffer,u16 StartIndex,u16 Length);
+static void _voidSetIsStart(void);
+static void _voidSetIsRepeat(void);
+#if 0
+static u8 _u8WriteRawSignalBuffer(u32* SrcArr);
+#endif
 #endif

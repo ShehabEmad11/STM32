@@ -19,6 +19,6 @@ extern void HLEDMRX_voidDisableColumn(u8 copy_u8ColumnNumber);
 extern void HLEDMRX_voidDisableAllRow(void);
 extern void HLEDMRX_voidDisableAllColumn(void);
 extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime);
-
+extern void HLEDMRX_voidDisplayShifting(u8* copy_u8PtrCharRow,u32 copy_u32ShiftTime);
 
 #endif

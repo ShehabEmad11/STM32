@@ -66,6 +66,9 @@ extern void HLEDMRX_voidInit(void)
 
 extern void HLEDMRX_voidEnableRow(u8 copy_u8RowNumber)
 {
+	if(copy_u8RowNumber>=HLEDMRX_ROWDIMENSION)
+			return;
+
 	if(HLEDMRX_ROWPOLARITY==ANODE)
 	{
 		MGPIO_voidSetPinValue(Row_u8ArrayPORT[copy_u8RowNumber],Row_u8ArrayPIN[copy_u8RowNumber],GPIO_HIGH);
@@ -81,6 +84,9 @@ extern void HLEDMRX_voidEnableRow(u8 copy_u8RowNumber)
 }
 extern void HLEDMRX_voidDisableRow(u8 copy_u8RowNumber)
 {
+	if(copy_u8RowNumber>=HLEDMRX_ROWDIMENSION)
+			return;
+
 	if(HLEDMRX_ROWPOLARITY==ANODE)
 	{
 		MGPIO_voidSetPinValue(Row_u8ArrayPORT[copy_u8RowNumber],Row_u8ArrayPIN[copy_u8RowNumber],GPIO_LOW);
@@ -97,6 +103,9 @@ extern void HLEDMRX_voidDisableRow(u8 copy_u8RowNumber)
 
 extern void HLEDMRX_voidEnableColumn(u8 copy_u8ColumnNumber)
 {
+	if(copy_u8ColumnNumber>=HLEDMRX_COLUMNDIMENSION)
+		return;
+
 	if(HLEDMRX_COLUMNPOLARITY==ANODE)
 	{
 		MGPIO_voidSetPinValue(Column_u8ArrayPORT[copy_u8ColumnNumber],Column_u8ArrayPIN[copy_u8ColumnNumber],GPIO_HIGH);
@@ -112,6 +121,9 @@ extern void HLEDMRX_voidEnableColumn(u8 copy_u8ColumnNumber)
 }
 extern void HLEDMRX_voidDisableColumn(u8 copy_u8ColumnNumber)
 {
+	if(copy_u8ColumnNumber>=HLEDMRX_COLUMNDIMENSION)
+			return;
+
 	if(HLEDMRX_COLUMNPOLARITY==ANODE)
 	{
 		MGPIO_voidSetPinValue(Column_u8ArrayPORT[copy_u8ColumnNumber],Column_u8ArrayPIN[copy_u8ColumnNumber],GPIO_LOW);
@@ -175,8 +187,15 @@ extern void HLEDMRX_voidDisableAllColumn(void)
 extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
 {
 	u8 i,j;
-	u32 local_u32Counter=0;
-	while(local_u32Counter<copy_u32DisplayTime)
+	uint32 local_u32NumOfDisplayTimes;
+
+	/*calculate number of times to display any char on LEDMRX (note that 20,000Ms (20ms) is the minimum Display time*/
+	local_u32NumOfDisplayTimes = copy_u32DisplayTime / HLEDMRX_MIN_DISPLAY_TIME;
+
+	/*Reform Display time to be multiples of Minimum Time Per Word*/
+	//copy_u32DisplayTime = copy_u32DisplayTime - (copy_u32DisplayTime % HLEDMRX_MIN_DISPLAY_TIME);
+
+	while(local_u32NumOfDisplayTimes>0)
 	{
 		for(i=0;i<HLEDMRX_COLUMNDIMENSION;i++)
 		{
@@ -194,18 +213,63 @@ extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
 					/*Error*/
 				}
 			}
+			/*Max timer input is 65536 (u16 register)
+			 * Min Time for human eye and brain to realize is 2.5ms*/
 			MTIMR2to5_voidSetBusyWait(2,2500);
-			local_u32Counter+=2500;
+//			local_u32Counter+=2500;
 		}
+		local_u32NumOfDisplayTimes--;
 	}
 	HLEDMRX_voidDisableAllColumn();
 	HLEDMRX_voidDisableAllRow();
 }
 
+extern void HLEDMRX_voidDisplayShifting(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
+{
+	u8 i,j,local_u8ShiftCounter;
+	u32 local_u32PerShiftTime,local_u32temp=0;
 
+    local_u32PerShiftTime = copy_u32DisplayTime / (MIN_NUMOFSHIFTS);
+
+    if(local_u32PerShiftTime<HLEDMRX_MIN_DISPLAY_TIME)
+    {
+    	return;
+    }
+
+	for(local_u8ShiftCounter=0; local_u8ShiftCounter<HLEDMRX_COLUMNDIMENSION; local_u8ShiftCounter++)
+	{
+		while(local_u32temp<local_u32PerShiftTime)
+		{
+			for(i=0;i<HLEDMRX_COLUMNDIMENSION;i++)
+			{
+				HLEDMRX_voidDisableAllColumn();
+				HLEDMRX_voidDisableAllRow();
+				HLEDMRX_voidEnableColumn(i+local_u8ShiftCounter);
+				for(j=0;j<HLEDMRX_ROWDIMENSION;j++)
+				{
+					if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_HIGH)
+							HLEDMRX_voidEnableRow(j);
+					else if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_LOW)
+						HLEDMRX_voidDisableRow(j);
+					else
+						/*Error*/
+						asm("nop");
+				}
+				MTIMR2to5_voidSetBusyWait(2,2500);
+			}
+			local_u32temp += 20000;
+		}
+		local_u32temp=0;
+	}
+
+	HLEDMRX_voidDisableAllColumn();
+	HLEDMRX_voidDisableAllRow();
+}
+
+
+#if 0
 extern void HLEDMRX_voidDisplayShifting(u8* copy_u8PtrCharRow,u32 copy_u32ShiftTime)
 {
-
 	u8 i,j,local_u8ShiftCounter;
 	local_u8ShiftCounter=0;
 	u32 local_u32ShiftTime;
@@ -236,4 +300,10 @@ extern void HLEDMRX_voidDisplayShifting(u8* copy_u8PtrCharRow,u32 copy_u32ShiftT
 		local_u32ShiftTime=0;
 		local_u8ShiftCounter++;
 	}
+
+	HLEDMRX_voidDisableAllColumn();
+	HLEDMRX_voidDisableAllRow();
 }
+#endif
+
+

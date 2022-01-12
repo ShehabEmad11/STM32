@@ -170,4 +170,7 @@ void SysTick_Handler(void)
 	3-Reading Ctrl Register or Flag
 	4-Writing VAL Register*/
 	Local_u8Temporary = GET_BIT(MSTK->CTRL,16);
+
+	//to write compiler warning
+	(u8)Local_u8Temporary;
 }
