@@ -345,7 +345,8 @@ void main()
 	MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT1, 1000);
 	MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT2, 3);
 
-	HLEDMRX_voidDisplayAsync(LEDMRX_1,10000000);
+	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_E,100000*8,100000);
+
 	while (1)
 	{
 

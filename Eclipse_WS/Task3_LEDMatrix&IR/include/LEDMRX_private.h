@@ -1,7 +1,7 @@
 /***********************************/
 /*Author: Shehab emad*/
-/*Version 1.3*/
-/*Data:19/7/2021*/
+/*Version 2.0*/
+/*Data:13/1/2022*/
 /**************************************/
  
 #ifndef LEDMRX_PRIVATE_H
@@ -13,7 +13,8 @@
 #include "GPIO_interface.h"
 #include "LEDMRX_config.h"
 
-
+typedef enum {MODE_STATIC,MODE_SHIFTING}HLEDMRX_enuDispMode_t;
+typedef enum {STATUS_NODELAY,STATUS_DELAY}enuDisplayDelay_t;
 
 /*These 3 private lines translate the frequnecy to OUTPUT mode and frequency*/
 #define FREQ_MAX_2MHZ		OUTPUT_SPEED_2MHZ_PP
@@ -43,5 +44,5 @@
 #define COLUMNPINS						 CATHODEPINS
 #endif
 
-#define MIN_NUMOFSHIFTS					 HLEDMRX_COLUMNDIMENSION
+#define HLEDMRX_SHIFTSNUMBER			 HLEDMRX_COLUMNDIMENSION
 #endif
