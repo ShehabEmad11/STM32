@@ -186,34 +186,58 @@ extern void HLEDMRX_voidDisableAllColumn(void)
 
 
 
-static HLEDMRX_enuStatus LEDMRX_Status=HLEDMRX_STATUS_FREE;
+static HLEDMRX_enuStatus_t LEDMRX_enuStatus=HLEDMRX_STATUS_FREE;
 
-extern HLEDMRX_enuStatus HLEDMRX_GetDisplayStatus(void)
+//TODO: to be reset after finishing
+static uint8 * globalstatic_ptru8Char=NULL;//u32 copy_u32DisplayTime
+static uint32 globalstatic_u32DisplayTimeMs=0;
+
+extern HLEDMRX_enuStatus_t HLEDMRX_GetDisplayStatus(void)
 {
-	return(LEDMRX_Status);
+	return(LEDMRX_enuStatus);
 }
 
-extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
+extern void HLEDMRX_voidMainFunction()
 {
-#define STATUS_NODELAY 				(0)
-#define STATUS_DELAY				(1)
-#define LEDMRX_CONTEXT		(MTIMx_CONTEXT0)
+	/*This Function must be called cyclic every < LEDMRXDELAYms value
+	 *This function is the main LEDMRX function and used to avoid Blockage(using of setBusyWait) in Displaying*/
+	typedef enum {STATUS_NODELAY,STATUS_DELAY}enuDisplayDelay_t;
+	#define LEDMRX_CONTEXT		(MTIMx_CONTEXT0)
+	//TODO: converted to 2500 Ms after editing SetAlarmfunction to be in Ms
+	#define LEDMRXDELAYms		(3)
+	static enuDisplayDelay_t localstatic_enuDisplayDelayStatus=STATUS_NODELAY;
+	static uint8 columnIter;//,breakflag;
+	static uint8* localstatic_Ptru8CurrChar=NULL;
+	uint8 rowIter,local_u8IsCurrDelayAlarmFired=FALSE;
 
-	static uint8 DisplayingDelayStatus=STATUS_NODELAY;
-	static uint8 i,breakflag;
-	static uint32 local_u32NumOfDisplayTimes;
-	uint8 j,local_u8IsCurrDelayAlarmFired=FALSE;
-
-	LEDMRX_Status=HLEDMRX_STATUS_BUSY;
-
-	if(DisplayingDelayStatus==STATUS_NODELAY)
+	if( (NULL == globalstatic_ptru8Char) || (globalstatic_u32DisplayTimeMs == 0ul) )
 	{
-		/*if no going display operations,calculate number of times to display any char on LEDMRX (note that 20,000Ms (20ms) is the minimum Display time*/
-		local_u32NumOfDisplayTimes = copy_u32DisplayTime / HLEDMRX_MIN_DISPLAY_TIME;
-		i=0;
-		breakflag=0;
+		return;
 	}
-	else if(DisplayingDelayStatus==STATUS_DELAY)
+
+	if(LEDMRX_enuStatus==HLEDMRX_STATUS_FREE)
+	{
+		/*For First Time only*/
+		if(NULL==localstatic_Ptru8CurrChar)
+			localstatic_Ptru8CurrChar=globalstatic_ptru8Char;
+
+		columnIter=0;
+		LEDMRX_enuStatus=HLEDMRX_STATUS_BUSY;
+	}
+
+	/*In case of LEDMRX input changed during runtime we will display last received*/
+	if(localstatic_Ptru8CurrChar != globalstatic_ptru8Char)
+	{
+		columnIter=0;
+		/*Reset Delay Status to avoic checking on delay for this function call*/
+		localstatic_enuDisplayDelayStatus=STATUS_NODELAY;
+		/*Clear Alarm*/
+		TIMx_u8ClrAlarmFired(MTIMER_2 , LEDMRX_CONTEXT);
+		/*Re-Save Current Character*/
+		localstatic_Ptru8CurrChar=globalstatic_ptru8Char;
+	}
+
+	if(localstatic_enuDisplayDelayStatus==STATUS_DELAY)
 	{
 		/*Check if Alarms Fired*/
 		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , LEDMRX_CONTEXT,&local_u8IsCurrDelayAlarmFired))
@@ -226,54 +250,71 @@ extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTi
 		/*Clear Alarm*/
 		TIMx_u8ClrAlarmFired(MTIMER_2 , LEDMRX_CONTEXT);
 		local_u8IsCurrDelayAlarmFired=FALSE;
-		DisplayingDelayStatus=STATUS_NODELAY;
-		breakflag=0;
-		i++;
-//		MGPIO_voidTogglePin(GPIOA, PIN10);
-		asm("nop");
+		localstatic_enuDisplayDelayStatus=STATUS_NODELAY;
+		columnIter++;
+		if(columnIter >= HLEDMRX_COLUMNDIMENSION)
+			columnIter=0;
+		//TODO: remove 1000 after editing SetAlarmfunction to be in Ms
+		if(globalstatic_u32DisplayTimeMs > LEDMRXDELAYms*1000 )
+			globalstatic_u32DisplayTimeMs -= LEDMRXDELAYms*1000;
+		else
+			globalstatic_u32DisplayTimeMs=0;
 	}
 
-	while(local_u32NumOfDisplayTimes>0)
+	while(globalstatic_u32DisplayTimeMs>0)
 	{
-		while(i<HLEDMRX_COLUMNDIMENSION)
+		while(columnIter<HLEDMRX_COLUMNDIMENSION)
 		{
 			HLEDMRX_voidDisableAllColumn();
 			HLEDMRX_voidDisableAllRow();
-			HLEDMRX_voidEnableColumn(i);
-			for(j=0;j<HLEDMRX_ROWDIMENSION;j++)
+			HLEDMRX_voidEnableColumn(columnIter);
+			for(rowIter=0; rowIter<HLEDMRX_ROWDIMENSION; rowIter++)
 			{
-				if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_HIGH)
-					HLEDMRX_voidEnableRow(j);
-				else if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_LOW)
-					HLEDMRX_voidDisableRow(j);
-				else;/*Error*/
+				if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_HIGH)
+					HLEDMRX_voidEnableRow(rowIter);
+				else if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_LOW)
+					HLEDMRX_voidDisableRow(rowIter);
+				else
+					asm("nop");/*Error*/
 			}
-			/*Max timer input is 65536 (u16 register)
-			 * Min Time for human eye and brain to realize is 2.5ms*/
-			//MTIMR2to5_voidSetBusyWait(2,2500);
+			/* minimum Time for human eye and brain to realize is 2.5ms*/
 			/*Set Alarm from timer2 context 0 for 3ms)*/
-			MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , LEDMRX_CONTEXT, 3);
+			//TODO: LEDMRXDELAYms to be 2500Ms not 3ms  after editing SetAlarmfunction to be in Ms
+			MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , LEDMRX_CONTEXT, LEDMRXDELAYms);
 
-			DisplayingDelayStatus=STATUS_DELAY;
-			breakflag=1;
-			break;
-			/* i will be incremented after delay checked in the next functional call*/
-//			local_u32Counter+=2500;
-		}
-		if(breakflag)
-			break;
+			localstatic_enuDisplayDelayStatus=STATUS_DELAY;
+			return; //return from function to be entered again in its periodic cycle
+		}//Columns' loop
+	}//Displaytime's loop
 
-		local_u32NumOfDisplayTimes--;
-		i=0;
-	}
-	if(breakflag)
-		return;
-
+	/*If we reached here this means that display time finished and character displayed successfully*/
 	HLEDMRX_voidDisableAllColumn();
 	HLEDMRX_voidDisableAllRow();
-	LEDMRX_Status=HLEDMRX_STATUS_FREE;
+	globalstatic_u32DisplayTimeMs = 0ul;
+	globalstatic_ptru8Char=NULL;
+	localstatic_Ptru8CurrChar=NULL;
+	LEDMRX_enuStatus=HLEDMRX_STATUS_FREE;
 }
 
+
+extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
+{
+	/*This function is used to Request Display of a LEDMRX character
+	 * it must be used in conjunction with HLEDMRX_voidMainFunction*/
+
+	/*if no going display operations,calculate number of times to display any char on LEDMRX (note that 20,000Ms (20ms) is the minimum Display time*/
+	if(copy_u32DisplayTime < HLEDMRX_MIN_DISPLAY_TIME)
+		return;
+#if 0
+	if( (NULL != globalstatic_ptru8Char) || (globalstatic_u32DisplayTimeMs != 0ul) )
+	{
+		return;
+	}
+#endif
+
+	globalstatic_u32DisplayTimeMs = copy_u32DisplayTime;
+	globalstatic_ptru8Char = copy_u8PtrCharRow;
+}
 
 extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
 {

@@ -305,6 +305,7 @@ void main()
 	uint8 local_u8IsCurrDelayAlarmFired=FALSE;
 
 	u8 local_u8IsAlarmFired0=FALSE,local_u8IsAlarmFired1=FALSE,local_u8IsAlarmFired2=FALSE,local_u8IsAlarmFired3=FALSE,local_u8IsAlarmFired4=FALSE;
+	u8 secCount=0;
 
 	/*Enable HSE system clock*/
 	MRCC_voidInitSysClock();
@@ -342,28 +343,39 @@ void main()
 
 
 	MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT1, 1000);
+	MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT2, 3);
 
-	HLEDMRX_voidDisplayAsync(LEDMRX_1,60000000);
+	HLEDMRX_voidDisplayAsync(LEDMRX_1,10000000);
 	while (1)
 	{
-		if(HLEDMRX_GetDisplayStatus()==HLEDMRX_STATUS_BUSY)
-		{	//could pass any arguments
-			//TODO: handle this at HLEDMRX_voidMainFunc();
-			HLEDMRX_voidDisplayAsync(LEDMRX_1,60000000);
-		}
 
 		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT1,&local_u8IsCurrDelayAlarmFired))
 			return;
+		if(local_u8IsCurrDelayAlarmFired==TRUE)
+		{
+			/*Clear Alarm*/
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT1);
+			local_u8IsCurrDelayAlarmFired=FALSE;
+			MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT1, 1000);
+			MGPIO_voidTogglePin(GPIOA, PIN10);
+			secCount++;
+			/*Change LEDMRX display before its time is out during runtime */
+			if(secCount==5)
+				HLEDMRX_voidDisplayAsync(LEDMRX_2,10000000);
 
-		if(local_u8IsCurrDelayAlarmFired==FALSE)
-			continue;
+		}
 
-		/*if we are here then alarm is fired*/
-		/*Clear Alarm*/
-		TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT1);
-		local_u8IsCurrDelayAlarmFired=FALSE;
-		MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT1, 1000);
-		MGPIO_voidTogglePin(GPIOA, PIN10);
+
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT2,&local_u8IsCurrDelayAlarmFired))
+			return;
+		if(local_u8IsCurrDelayAlarmFired==TRUE)
+		{
+			/*Clear Alarm*/
+			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT2);
+			local_u8IsCurrDelayAlarmFired=FALSE;
+			MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT2, 3);
+			HLEDMRX_voidMainFunction();
+		}
 	}
 
 

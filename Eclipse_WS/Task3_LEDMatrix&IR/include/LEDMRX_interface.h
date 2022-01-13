@@ -14,7 +14,7 @@
 typedef enum
 {
 	HLEDMRX_STATUS_FREE,HLEDMRX_STATUS_BUSY
-}HLEDMRX_enuStatus;
+}HLEDMRX_enuStatus_t;
 
 
 extern void HLEDMRX_voidInit(void);
@@ -27,8 +27,13 @@ extern void HLEDMRX_voidDisableAllColumn(void);
 extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime);
 extern void HLEDMRX_voidDisplayShifting(u8* copy_u8PtrCharRow,u32 copy_u32ShiftTime);
 
+/*This Function must be called cyclic every < LEDMRXDELAYms value
+ *This function is the main LEDMRX function and used to avoid Blockage(using of setBusyWait) in Displaying*/
+extern void HLEDMRX_voidMainFunction();
+/*This function is used to Request Display of a LEDMRX character
+ * it must be used in conjunction with HLEDMRX_voidMainFunction*/
 extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime);
-extern HLEDMRX_enuStatus HLEDMRX_GetDisplayStatus(void);
+extern HLEDMRX_enuStatus_t HLEDMRX_GetDisplayStatus(void);
 
 
 #endif
