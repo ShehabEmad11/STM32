@@ -32,9 +32,10 @@ extern void HLEDMRX_voidDisplayShifting(u8* copy_u8PtrCharRow,u32 copy_u32Displa
 extern void HLEDMRX_voidMainFunction();
 /*This function is used to Request Display of a LEDMRX character
  * it must be used in conjunction with HLEDMRX_voidMainFunction*/
-extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime);
-extern void HLEDMRX_voidDisplayShiftingAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime,u32 copy_u32PerShiftTime);
+extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow);
+extern void HLEDMRX_voidDisplayShiftingAsync(u8* copy_u8PtrCharRow,u32 copy_u32PerShiftTime);
 extern HLEDMRX_enuStatus_t HLEDMRX_GetDisplayStatus(void);
+extern void HLEDMRX_voidRequestStop(void);
 
 
 #endif

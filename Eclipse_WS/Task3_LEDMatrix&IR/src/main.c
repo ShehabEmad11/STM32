@@ -279,6 +279,8 @@ void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
 }
 
 
+
+
 /*USED APPROACH:
  The following assumptions and info are used regarding the IR frames reception
  1)We received new frame which takes 67.5ms(from start to end)
@@ -335,17 +337,16 @@ void main()
 
 
 
-//TODO: handle alarms don't initialize time (needs to count relative)
-
+	//TODO: handle that alarms don't re-initialize time when set it needs to compensate for already passed time  (needs to count relative)
 	//TODO: check if to be moved
-	/*Set Timer each 1ms*/
-	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 1000, MTIM2_voidCyclic1ms);
+	/*Set Timer each 500Ms*/
+	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, TIM2_BASETICK_Ms, MTIM2_voidCountAndFireTIM2Alarms);
 
 
-	MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT1, 1000);
-	MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT2, 3);
+	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT1, 1000000);
+	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT2, 2500);
 
-	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_E,100000*8,100000);
+	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_E,125000);
 
 	while (1)
 	{
@@ -357,13 +358,19 @@ void main()
 			/*Clear Alarm*/
 			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT1);
 			local_u8IsCurrDelayAlarmFired=FALSE;
-			MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT1, 1000);
-			MGPIO_voidTogglePin(GPIOA, PIN10);
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT1, 1000000);
+			//MGPIO_voidTogglePin(GPIOA, PIN10);
+			MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_HIGH);
 			secCount++;
 			/*Change LEDMRX display before its time is out during runtime */
-			if(secCount==5)
-				HLEDMRX_voidDisplayAsync(LEDMRX_2,10000000);
+			if(secCount==10)
+			{
+				HLEDMRX_voidRequestStop();
+				MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_LOW);
+			}
 
+			if(secCount==20)
+				HLEDMRX_voidDisplayAsync(LEDMRX_2);
 		}
 
 
@@ -374,7 +381,7 @@ void main()
 			/*Clear Alarm*/
 			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT2);
 			local_u8IsCurrDelayAlarmFired=FALSE;
-			MTIMR2to5_voidSetAlarm_ms(MTIMER_2,MTIMx_CONTEXT2, 3);
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT2, 2500);
 			HLEDMRX_voidMainFunction();
 		}
 	}

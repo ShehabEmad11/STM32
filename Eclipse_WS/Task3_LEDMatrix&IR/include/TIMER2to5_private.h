@@ -39,7 +39,6 @@ typedef struct
 #define TIMx_SINGLE_INTERVAL	(1)
 #define TIMx_PERIODIC_INTERVAL	(2)
 
-static void _voidCountAndFireAlarms(void);
 
 /*Casting address to a pointer to structure*/
 #define MTIM2 ((volatile TIMx_t *)(0x40000000))
@@ -47,8 +46,9 @@ static void _voidCountAndFireAlarms(void);
 #define MTIM4 ((volatile TIMx_t *)(0x40000800))
 #define MTIM5 ((volatile TIMx_t *)(0x40000C00))
 
-typedef volatile TIMx_t *sptr;
-volatile TIMx_t (*TIMx[4])={(sptr)0x40000000,(sptr)0x40000400,(sptr)0x40000800,(sptr)0x40000C00};
+//typedef volatile TIMx_t *sptr;
+//volatile TIMx_t (*TIMx[4])={(sptr)0x40000000,(sptr)0x40000400,(sptr)0x40000800,(sptr)0x40000C00};
 
+volatile TIMx_t (*TIMx[4])={MTIM2,MTIM3,MTIM4,MTIM5};
 
 #endif

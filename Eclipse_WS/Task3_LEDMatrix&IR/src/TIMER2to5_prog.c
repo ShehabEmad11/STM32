@@ -13,13 +13,13 @@
 
 typedef struct
 {
-	uint32 AlarmVal_ms;
-	uint32 TimePassed_ms;
-	uint32 TimeRemaining_ms;
+	uint32 AlarmVal_Ms;
+	uint32 TimePassed_Ms;
 	uint8  IsAlarmSet:1;
 	uint8  IsAlarmFired:1;
 }TIMxContext_t;
 
+//Context0 ---->Used by LEDMRXs
 static TIMxContext_t TIMx_astrAlarmContext[4][TIMR2to5_MAXCONTEXTS];
 
 /* Define static global Variable for interval mode */
@@ -33,25 +33,19 @@ static void(*TIMx_ArrPtrCallBack[4])(void)={NULL,NULL,NULL,NULL};
 extern void MTIMR2to5_voidInit(u8 copy_u8TimerNumber, u16 copy_u16Prescaler)
 {
 	u8 ContextIterator;
-	if(copy_u8TimerNumber>=2  && copy_u8TimerNumber<=5)
-	{
-		/*Update Timer number to match with array in private file*/
-		copy_u8TimerNumber=copy_u8TimerNumber-2;
-	}
-	else
-	{
-		/*Wrong timer input*/
-		asm("nop");
+
+	if(copy_u8TimerNumber<MTIMER_2  || copy_u8TimerNumber>MTIMER_5)
 		return;
-	}
+
+	/*Update Timer number to match with array in private file*/
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 	
 	/*Initialize Context Array*/
 
 	for(ContextIterator=0;ContextIterator<TIMR2to5_MAXCONTEXTS;ContextIterator++)
 	{
-		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].AlarmVal_ms=0;
-		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].TimePassed_ms=0;
-		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].TimeRemaining_ms=0;
+		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].AlarmVal_Ms=0;
+		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].TimePassed_Ms=0;
 		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].IsAlarmSet=FALSE;
 		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].IsAlarmFired=FALSE;
 	}
@@ -84,17 +78,12 @@ extern void MTIMR2to5_voidInit(u8 copy_u8TimerNumber, u16 copy_u16Prescaler)
 
 extern void MTIMR2to5_voidSetBusyWait(u8 copy_u8TimerNumber,u16 copy_u16Delay)
 {
-	if(copy_u8TimerNumber>=2  && copy_u8TimerNumber<=5)
-	{
-		/*Update Timer number to match with array in private file*/
-		copy_u8TimerNumber=copy_u8TimerNumber-2;
-	}
-	else
-	{
-		/*Wrong timer input*/
-		asm("nop");
-		return ;
-	}
+	if(copy_u8TimerNumber<MTIMER_2  || copy_u8TimerNumber>MTIMER_5)
+		return;
+
+	/*Update Timer number to match with array in private file*/
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
+
 	/* Load ticks to load register */
 	TIMx[copy_u8TimerNumber]->ARR=copy_u16Delay;
 
@@ -125,17 +114,11 @@ extern void MTIMR2to5_voidSetBusyWait(u8 copy_u8TimerNumber,u16 copy_u16Delay)
 
 extern void MTIMR2to5_voidSetTimerSingle(u8 copy_u8TimerNumber,u16 copy_u16Delay,void (*copy_Ptr2CallBack)(void))
 {
-	if(copy_u8TimerNumber>=2  && copy_u8TimerNumber<=5)
-	{
-		/*Update Timer number to match with array in private file*/
-		copy_u8TimerNumber=copy_u8TimerNumber-2;
-	}
-	else
-	{
-		/*Wrong timer input*/
-		asm("nop");
-		return ;
-	}
+	if(copy_u8TimerNumber<MTIMER_2  || copy_u8TimerNumber>MTIMER_5)
+		return;
+
+	/*Update Timer number to match with array in private file*/
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
 	/* Save CallBack */
 	TIMx_ArrPtrCallBack[copy_u8TimerNumber] = copy_Ptr2CallBack;
@@ -159,19 +142,13 @@ extern void MTIMR2to5_voidSetTimerSingle(u8 copy_u8TimerNumber,u16 copy_u16Delay
 }
 
 
-extern void MTIMR2to5_voidSetTimerPeriodic(u8 copy_u8TimerNumber,u16 copy_u16Delay,void (*copy_Ptr2CallBack)(void))
+extern void MTIMR2to5_voidSetTimerPeriodic(u8 copy_u8TimerNumber,u16 copy_u16PeriodMs,void (*copy_Ptr2CallBack)(void))
 {
-	if(copy_u8TimerNumber>=2  && copy_u8TimerNumber<=5)
-	{
-		/*Update Timer number to match with array in private file*/
-		copy_u8TimerNumber=copy_u8TimerNumber-2;
-	}
-	else
-	{
-		/*Wrong timer input*/
-		asm("nop");
-		return ;
-	}
+	if(copy_u8TimerNumber<MTIMER_2  || copy_u8TimerNumber>MTIMER_5)
+		return;
+
+	/*Update Timer number to match with array in private file*/
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
 	/* Save CallBack */
 	TIMx_ArrPtrCallBack[copy_u8TimerNumber] = copy_Ptr2CallBack;
@@ -180,7 +157,7 @@ extern void MTIMR2to5_voidSetTimerPeriodic(u8 copy_u8TimerNumber,u16 copy_u16Del
 	TIMx_u8ArrModeOfInterval[copy_u8TimerNumber] = TIMx_PERIODIC_INTERVAL;
 
 	/* Load ticks to load register */
-	TIMx[copy_u8TimerNumber]->ARR=copy_u16Delay;
+	TIMx[copy_u8TimerNumber]->ARR=copy_u16PeriodMs;
 
 	/*Force update event without setting update interrupt flag by setting BIT0_UG in EGR while URS_Bit2 in
 	 TIMx_CR1 is set */
@@ -194,44 +171,41 @@ extern void MTIMR2to5_voidSetTimerPeriodic(u8 copy_u8TimerNumber,u16 copy_u16Del
 	SET_BIT(TIMx[copy_u8TimerNumber]->CR1,0);
 }
 
-extern void MTIMR2to5_voidSetAlarm_ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u32 copy_u32msVal)
+extern void MTIMR2to5_voidSetAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u32 copy_u32MsVal)
 {
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
 		return;
-	if(copy_u8TimerNumber<2 ||  copy_u8TimerNumber>5)
-		return;
+	if(copy_u8TimerNumber<MTIMER_2 ||  copy_u8TimerNumber>MTIMER_5)
+		return ;
 
 	/*Update Timer number to match with array in private file*/
-	copy_u8TimerNumber=copy_u8TimerNumber-2;
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
-	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].TimePassed_ms=0;
-	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].TimeRemaining_ms=0;
-	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].AlarmVal_ms=copy_u32msVal;
+
+	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].AlarmVal_Ms=copy_u32MsVal;
+	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].TimePassed_Ms=0;
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmFired=FALSE;
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmSet=TRUE;
 }
 
 
 
-static void _voidCountAndFireAlarms(void)
+extern void MTIM2_voidCountAndFireTIM2Alarms(void)
 {
-	u8 TimerxIterator,ContextIterator;
+	u8 ContextIterator;
 
-	for(TimerxIterator=0;TimerxIterator<5;TimerxIterator++)
+	for(ContextIterator=0;ContextIterator<TIMR2to5_MAXCONTEXTS;ContextIterator++)
 	{
-		for(ContextIterator=0;ContextIterator<TIMR2to5_MAXCONTEXTS;ContextIterator++)
+		if(	TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmSet==TRUE
+		&&  TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmFired==FALSE 	)
 		{
-			if(	TIMx_astrAlarmContext[TimerxIterator][ContextIterator].IsAlarmSet==TRUE
-			&&  TIMx_astrAlarmContext[TimerxIterator][ContextIterator].IsAlarmFired==FALSE 	)
-			{
-				TIMx_astrAlarmContext[TimerxIterator][ContextIterator].TimePassed_ms ++;
+			TIMx_astrAlarmContext[MTIMER_2][ContextIterator].TimePassed_Ms += TIM2_BASETICK_Ms;
 
-				if(TIMx_astrAlarmContext[TimerxIterator][ContextIterator].TimePassed_ms
-				>= TIMx_astrAlarmContext[TimerxIterator][ContextIterator].AlarmVal_ms )
-				{
-					TIMx_astrAlarmContext[TimerxIterator][ContextIterator].IsAlarmFired=TRUE;
-					TIMx_astrAlarmContext[TimerxIterator][ContextIterator].IsAlarmSet=FALSE;
-				}
+			if(TIMx_astrAlarmContext[MTIMER_2][ContextIterator].TimePassed_Ms
+			>= TIMx_astrAlarmContext[MTIMER_2][ContextIterator].AlarmVal_Ms )
+			{
+				TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmFired=TRUE;
+				TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmSet=FALSE;
 			}
 		}
 	}
@@ -242,11 +216,11 @@ extern u8 TIMx_u8IsAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u8* 
 {
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
 		return E_NOT_OK;
-	if(copy_u8TimerNumber<2 ||  copy_u8TimerNumber>5)
+	if(copy_u8TimerNumber<MTIMER_2 ||  copy_u8TimerNumber>MTIMER_5)
 		return E_NOT_OK;
 
 	/*Update Timer number to match with array in private file*/
-	copy_u8TimerNumber=copy_u8TimerNumber-2;
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
 	*copy_Ptr2u8AlarmState= TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmFired;
 
@@ -257,21 +231,17 @@ extern u8 TIMx_u8ClrAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber)
 {
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
 		return E_NOT_OK;
-	if(copy_u8TimerNumber<2 ||  copy_u8TimerNumber>5)
+	if(copy_u8TimerNumber<MTIMER_2 ||  copy_u8TimerNumber>MTIMER_5)
 		return E_NOT_OK;
 
 	/*Update Timer number to match with array in private file*/
-	copy_u8TimerNumber=copy_u8TimerNumber-2;
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmFired=FALSE;
 
 	return E_OK;
 }
 
-extern void MTIM2_voidCyclic1ms(void)
-{
-	_voidCountAndFireAlarms();
-}
 
 
 void TIM2_IRQHandler(void)

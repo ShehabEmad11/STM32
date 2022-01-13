@@ -36,8 +36,8 @@ FREQ_MAX_xMHZ defined in private.h to be translated into GPIO Frequencies
 */
 #define HLEDMRX_MAX_FREQUENCY				FREQ_MAX_2MHZ
 
-
-#define HLEDMRX_MIN_DISPLAY_TIME			(24000ul) //8*3ms
+#define LEDMRXDELAYMs						(2500ul)  //  2500Ms
+#define HLEDMRX_MIN_DISPLAY_TIME			(20000ul) //8*2500Ms
 
 
 #if 0

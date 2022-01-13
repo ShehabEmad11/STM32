@@ -189,12 +189,17 @@ extern void HLEDMRX_voidDisableAllColumn(void)
 static HLEDMRX_enuStatus_t LEDMRX_enuStatus=HLEDMRX_STATUS_FREE;
 static HLEDMRX_enuDispMode_t LEDMRX_enuCurrentDispMode=MODE_STATIC;
 static uint8 * globalstatic_ptru8Char=NULL;
-static uint32 globalstatic_u32DisplayTimeMs=0;
 static uint32 globalstatic_u32PerShiftTime=0;
+static uint8 globalsatic_u8IsStopRequested=FALSE;
 
 extern HLEDMRX_enuStatus_t HLEDMRX_GetDisplayStatus(void)
 {
 	return(LEDMRX_enuStatus);
+}
+
+extern void HLEDMRX_voidRequestStop(void)
+{
+	globalsatic_u8IsStopRequested=TRUE;
 }
 
 extern void HLEDMRX_voidMainFunction()
@@ -202,21 +207,33 @@ extern void HLEDMRX_voidMainFunction()
 	/*This Function must be called cyclic every < LEDMRXDELAYms value
 	 *This function is the main LEDMRX function and used to avoid Blockage(using of setBusyWait) in Displaying*/
 
-	//TODO: remove #define de
-	//TODO: edit HLEDMRX_MIN_DISPLAY_TIME In CONFIG
 	//TODO: handle display mode switch in runtime
+	//TODO: move this #define
 	#define LEDMRX_CONTEXT		(MTIMx_CONTEXT0)
-	//TODO: converted to 2500 Ms after editing SetAlarmfunction to be in Ms
-	#define LEDMRXDELAYms		(3)
+
 	static enuDisplayDelay_t localstatic_enuDisplayDelayStatus=STATUS_NODELAY;
 	static uint8 columnIter,localstatic_u8ShiftCounter;
 	static uint8* localstatic_Ptru8CurrChar=NULL;
 	static uint32 localstatic_u32CurrPerShiftTime;
 	uint8 rowIter,local_u8IsCurrDelayAlarmFired=FALSE;
 
-	if( (NULL == globalstatic_ptru8Char) || (globalstatic_u32DisplayTimeMs == 0ul) )
+	if( (NULL == globalstatic_ptru8Char) )
 	{
 		return;
+	}
+
+	if(globalsatic_u8IsStopRequested==TRUE)
+	{
+		HLEDMRX_voidDisableAllColumn();
+		HLEDMRX_voidDisableAllRow();
+		globalstatic_u32PerShiftTime=0ul;
+		localstatic_u32CurrPerShiftTime=0;
+		globalstatic_ptru8Char=NULL;
+		localstatic_Ptru8CurrChar=NULL;
+		localstatic_u8ShiftCounter=0;
+		LEDMRX_enuStatus=HLEDMRX_STATUS_FREE;
+
+		globalsatic_u8IsStopRequested=FALSE;
 	}
 
 
@@ -263,15 +280,11 @@ extern void HLEDMRX_voidMainFunction()
 		local_u8IsCurrDelayAlarmFired=FALSE;
 		localstatic_enuDisplayDelayStatus=STATUS_NODELAY;
 
-		//TODO: remove 1000 after editing SetAlarmfunction to be in Ms
-		if(globalstatic_u32DisplayTimeMs > LEDMRXDELAYms*1000 )
-			globalstatic_u32DisplayTimeMs -= LEDMRXDELAYms*1000;
-		else
-			globalstatic_u32DisplayTimeMs=0;
+
 
 		//SHIFTMODESPECIFIC
-		if(localstatic_u32CurrPerShiftTime > LEDMRXDELAYms*1000 )
-			localstatic_u32CurrPerShiftTime -= LEDMRXDELAYms*1000;
+		if(localstatic_u32CurrPerShiftTime > LEDMRXDELAYMs)
+			localstatic_u32CurrPerShiftTime -= LEDMRXDELAYMs;
 		else
 			localstatic_u32CurrPerShiftTime=0;
 
@@ -293,13 +306,37 @@ extern void HLEDMRX_voidMainFunction()
 
 	if(LEDMRX_enuCurrentDispMode==MODE_STATIC)
 	{
-		while(globalstatic_u32DisplayTimeMs>0)
+		while(columnIter<HLEDMRX_COLUMNDIMENSION)
+		{
+			HLEDMRX_voidDisableAllColumn();
+			HLEDMRX_voidDisableAllRow();
+			HLEDMRX_voidEnableColumn(columnIter);
+			for(rowIter=0; rowIter<HLEDMRX_ROWDIMENSION; rowIter++)
+			{
+				if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_HIGH)
+					HLEDMRX_voidEnableRow(rowIter);
+				else if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_LOW)
+					HLEDMRX_voidDisableRow(rowIter);
+				else
+					asm("nop");/*Error*/
+			}
+			/* minimum Time for human eye and brain to realize is 2.5ms*/
+			/*Set Alarm from timer2 context0 for 2500Ms)*/
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2 , LEDMRX_CONTEXT, LEDMRXDELAYMs);
+
+			localstatic_enuDisplayDelayStatus=STATUS_DELAY;
+			return; //return from function to be entered again in its periodic cycle
+		}//Columns' loop
+	}
+	else if (LEDMRX_enuCurrentDispMode==MODE_SHIFTING)
+	{
+		while(localstatic_u8ShiftCounter<HLEDMRX_SHIFTSNUMBER)
 		{
 			while(columnIter<HLEDMRX_COLUMNDIMENSION)
 			{
 				HLEDMRX_voidDisableAllColumn();
 				HLEDMRX_voidDisableAllRow();
-				HLEDMRX_voidEnableColumn(columnIter);
+				HLEDMRX_voidEnableColumn(columnIter+localstatic_u8ShiftCounter);
 				for(rowIter=0; rowIter<HLEDMRX_ROWDIMENSION; rowIter++)
 				{
 					if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_HIGH)
@@ -310,74 +347,39 @@ extern void HLEDMRX_voidMainFunction()
 						asm("nop");/*Error*/
 				}
 				/* minimum Time for human eye and brain to realize is 2.5ms*/
-				/*Set Alarm from timer2 context 0 for 3ms)*/
-				//TODO: LEDMRXDELAYms to be 2500Ms not 3ms  after editing SetAlarmfunction to be in Ms
-				MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , LEDMRX_CONTEXT, LEDMRXDELAYms);
+				/*Set Alarm from timer2 context0 for 2500Ms)*/
+				MTIMR2to5_voidSetAlarm_Ms(MTIMER_2 , LEDMRX_CONTEXT, LEDMRXDELAYMs);
 
 				localstatic_enuDisplayDelayStatus=STATUS_DELAY;
 				return; //return from function to be entered again in its periodic cycle
-			}//Columns' loop
-		}//Displaytime's loop
-	}
-	else if (LEDMRX_enuCurrentDispMode==MODE_SHIFTING)
-	{
-		while(globalstatic_u32DisplayTimeMs > 0ul)
-		{
-			while(localstatic_u8ShiftCounter<HLEDMRX_SHIFTSNUMBER)
-			{
-				while(columnIter<HLEDMRX_COLUMNDIMENSION)
-				{
-					HLEDMRX_voidDisableAllColumn();
-					HLEDMRX_voidDisableAllRow();
-					HLEDMRX_voidEnableColumn(columnIter+localstatic_u8ShiftCounter);
-					for(rowIter=0; rowIter<HLEDMRX_ROWDIMENSION; rowIter++)
-					{
-						if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_HIGH)
-							HLEDMRX_voidEnableRow(rowIter);
-						else if(GET_BIT(*(globalstatic_ptru8Char+columnIter),rowIter)==GPIO_LOW)
-							HLEDMRX_voidDisableRow(rowIter);
-						else
-							asm("nop");/*Error*/
-					}
-					/* minimum Time for human eye and brain to realize is 2.5ms*/
-					/*Set Alarm from timer2 context 0 for 3ms)*/
-					//TODO: LEDMRXDELAYms to be 2500Ms not 3ms  after editing SetAlarmfunction to be in Ms
-					MTIMR2to5_voidSetAlarm_ms(MTIMER_2 , LEDMRX_CONTEXT, LEDMRXDELAYms);
-
-					localstatic_enuDisplayDelayStatus=STATUS_DELAY;
-					return; //return from function to be entered again in its periodic cycle
-				}
 			}
 		}
 	}
 
-	/*If we reached here this means that display time finished and character displayed successfully*/
+#if 0
+	/*If we reached here, thats mean */
 	HLEDMRX_voidDisableAllColumn();
 	HLEDMRX_voidDisableAllRow();
-	globalstatic_u32DisplayTimeMs = 0ul;
 	globalstatic_u32PerShiftTime=0ul;
 	localstatic_u32CurrPerShiftTime=0;
 	globalstatic_ptru8Char=NULL;
 	localstatic_Ptru8CurrChar=NULL;
 	localstatic_u8ShiftCounter=0;
 	LEDMRX_enuStatus=HLEDMRX_STATUS_FREE;
+#endif
 }
 
 
-extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
+extern void HLEDMRX_voidDisplayAsync(u8* copy_u8PtrCharRow)
 {
 	/*This function is used to Request Display of a LEDMRX character
 	 * it must be used in conjunction with HLEDMRX_voidMainFunction*/
 
-	/*Calculate number of times to display any char on LEDMRX (note that 20,000Ms (20ms) is the minimum Display time*/
-	if(copy_u32DisplayTime < HLEDMRX_MIN_DISPLAY_TIME)
-		return;
 
 	/*Update Current DisplayMode (this is used later by LEDMRX_main)*/
 	LEDMRX_enuCurrentDispMode=MODE_STATIC;
 
 	/*Update GlobalStatic variables with current Character to display and time of display*/
-	globalstatic_u32DisplayTimeMs = copy_u32DisplayTime;
 	globalstatic_ptru8Char = copy_u8PtrCharRow;
 }
 
@@ -421,7 +423,7 @@ extern void HLEDMRX_voidDisplay(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime)
 	HLEDMRX_voidDisableAllRow();
 }
 
-extern void HLEDMRX_voidDisplayShiftingAsync(u8* copy_u8PtrCharRow,u32 copy_u32DisplayTime,u32 copy_u32PerShiftTime)
+extern void HLEDMRX_voidDisplayShiftingAsync(u8* copy_u8PtrCharRow,u32 copy_u32PerShiftTime)
 {
 	/*This function is used to Request Display of a LEDMRX character
 	 * it must be used in conjunction with HLEDMRX_voidMainFunction*/
@@ -429,66 +431,12 @@ extern void HLEDMRX_voidDisplayShiftingAsync(u8* copy_u8PtrCharRow,u32 copy_u32D
 	if(copy_u32PerShiftTime< HLEDMRX_MIN_DISPLAY_TIME)
 		return;
 
-	if(copy_u32DisplayTime < (HLEDMRX_MIN_DISPLAY_TIME * HLEDMRX_SHIFTSNUMBER))
-		return;
-
-	if( copy_u32DisplayTime < (copy_u32PerShiftTime * HLEDMRX_SHIFTSNUMBER))
-		return;
-
 	/*Update Current DisplayMode (this is used later by LEDMRX_main)*/
 	LEDMRX_enuCurrentDispMode=MODE_SHIFTING;
 
 	/*Update GlobalStatic variables with current Character to display and time of display*/
-	globalstatic_u32DisplayTimeMs = copy_u32DisplayTime;
 	globalstatic_ptru8Char = copy_u8PtrCharRow;
 	globalstatic_u32PerShiftTime = copy_u32PerShiftTime;
-
-
-	#if 0
-	u8 i,j,local_u8ShiftCounter;
-	u32 local_u32PerShiftTime,local_u32temp=0;
-
-
-    /*To be calculated,checked and decided here as it will not be checked in main function*/
-    local_u32PerShiftTime = copy_u32DisplayTime / (MIN_NUMOFSHIFTS);
-    if(local_u32PerShiftTime<HLEDMRX_MIN_DISPLAY_TIME)
-    {
-    	return;
-    }
-
-
-
-
-	for(local_u8ShiftCounter=0; local_u8ShiftCounter<HLEDMRX_COLUMNDIMENSION; local_u8ShiftCounter++)
-	{
-		while(local_u32temp<local_u32PerShiftTime)
-		{
-			for(i=0;i<HLEDMRX_COLUMNDIMENSION;i++)
-			{
-				HLEDMRX_voidDisableAllColumn();
-				HLEDMRX_voidDisableAllRow();
-				HLEDMRX_voidEnableColumn(i+local_u8ShiftCounter);
-				for(j=0;j<HLEDMRX_ROWDIMENSION;j++)
-				{
-					if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_HIGH)
-							HLEDMRX_voidEnableRow(j);
-					else if(GET_BIT(*(copy_u8PtrCharRow+i),j)==GPIO_LOW)
-						HLEDMRX_voidDisableRow(j);
-					else
-						/*Error*/
-						asm("nop");
-				}
-				MTIMR2to5_voidSetBusyWait(2,2500);
-			}
-			local_u32temp += 20000;
-		}
-		local_u32temp=0;
-	}
-
-	HLEDMRX_voidDisableAllColumn();
-	HLEDMRX_voidDisableAllRow();
-#endif
-
 }
 
 
