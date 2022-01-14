@@ -10,5 +10,6 @@
 /* Options: MSTK_SRC_AHB 	   OR		 MSTK_SRC_AHB_8 */
 #define MSTK_CLK_SRC     MSTK_SRC_AHB_8
 
+#define MSTK_MAX_LOADTICKS			(16777215ul)
 	
 #endif

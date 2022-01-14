@@ -11,11 +11,7 @@
 #include "LEDMRX_database.h"
 #include "IR_config.h"
 
-#define APP_HAMADABALL	(1)
-#define APP_TEXTDISP	(2)
-#define APPLICATION		APP_TEXTDISP
 
-uint8 AppPlayFlag=0;
 
 #define MODE 0
 #define TESTMODE 5
@@ -68,6 +64,30 @@ uint8 AppPlayFlag=0;
 
 #endif
 
+
+
+
+#define APP_HAMADABALL	(1)
+#define APP_TEXTDISP	(2)
+#define APPLICATION		APP_TEXTDISP
+#define BSW_CONTEXT		MTIMx_CONTEXT1
+#define APP_CONTEXT		MTIMx_CONTEXT2
+
+uint8 AppPlayFlag=0;
+
+void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
+{
+	u8 i;
+	for(i=0;i<buffsize;i++)
+	{
+		if(sizedatatype==1)
+			*((u8*)buff+i)=0;
+		else if(sizedatatype==2)
+			*((u16*)buff+i)=0;
+		else if(sizedatatype==4)
+			*((u32*)buff+i)=0;
+	}
+}
 
 
 
@@ -258,24 +278,7 @@ static void App_voidReadAndReact(u8* DataQ)
 		HLEDMRX_voidDisplayShifting(LEDMRX_U,(uint32)local_u32ShiftSpeedDelay);
 	}
 #endif
-	//TODO: to be added when triggering accurate timings
-	//MTIMR2to5_voidSetBusyWait(2,8000);
 	return;
-}
-
-
-void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
-{
-	u8 i;
-	for(i=0;i<buffsize;i++)
-	{
-		if(sizedatatype==1)
-			*((u8*)buff+i)=0;
-		else if(sizedatatype==2)
-			*((u16*)buff+i)=0;
-		else if(sizedatatype==4)
-			*((u32*)buff+i)=0;
-	}
 }
 
 
@@ -297,6 +300,10 @@ void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
  */
 
 
+
+
+
+
 void main()
  {
 	//This array to be removed after debugging and check on local var no need to array
@@ -308,6 +315,8 @@ void main()
 
 	u8 local_u8IsAlarmFired0=FALSE,local_u8IsAlarmFired1=FALSE,local_u8IsAlarmFired2=FALSE,local_u8IsAlarmFired3=FALSE,local_u8IsAlarmFired4=FALSE;
 	u8 secCount=0;
+
+	uint32 local_u32BSWBaseTicksCounter=0,local_u32APPBaseTicksCounter=0;		//Every increment= TIM2_BASETICK_Ms
 
 	/*Enable HSE system clock*/
 	MRCC_voidInitSysClock();
@@ -337,28 +346,57 @@ void main()
 
 
 
-	//TODO: handle that alarms don't re-initialize time when set it needs to compensate for already passed time  (needs to count relative)
-	//TODO: check if to be moved
-	/*Set Timer each 500Ms*/
-	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, TIM2_BASETICK_Ms, MTIM2_voidCountAndFireTIM2Alarms);
+	//TODO:Remove LEDMRX context timer and depend on main timer here
+	//TODO: check if next function call to be moved------>Could be moved to TIM init or as system init and Tim2 be considered OS timer which don't needs input arguments at call
+	/*Set Timer each 2500Ms*/
+	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 2500, MTIM2_voidCountAndFireTIM2Alarms);
 
 
-	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT1, 1000000);
-	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT2, 2500);
+	/*ALARM for Core Functions (BSW main functions)*/
+	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,BSW_CONTEXT, 2500);
 
-	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_E,125000);
 
-	while (1)
+	/*Alarm for Application*/
+	//MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,APP_CONTEXT, 500);
+
+
+	while(1)
 	{
 
-		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT1,&local_u8IsCurrDelayAlarmFired))
+	}
+#if 0
+	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_E,125000);
+	while (1)
+	{
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2, BSW_CONTEXT, &local_u8IsCurrDelayAlarmFired))
 			return;
 		if(local_u8IsCurrDelayAlarmFired==TRUE)
 		{
-			/*Clear Alarm*/
-			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT1);
+			/*Each increment corresponds to value TIM2_BASETICK_Ms passed*/
+			local_u32BSWBaseTicksCounter++;
 			local_u8IsCurrDelayAlarmFired=FALSE;
-			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT1, 1000000);
+
+			/*Reset Alarm*/
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, BSW_CONTEXT, 500);
+
+
+			HLEDMRX_voidMainFunction();
+		}
+
+
+
+		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2, APP_CONTEXT, &local_u8IsCurrDelayAlarmFired))
+			return;
+		if(local_u8IsCurrDelayAlarmFired==TRUE)
+		{
+			/*Each increment corresponds to value TIM2_BASETICK_Ms passed*/
+			local_u32APPBaseTicksCounter++;
+			local_u8IsCurrDelayAlarmFired=FALSE;
+
+			/*Reset Alarm*/
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, APP_CONTEXT, 500);
+
+
 			//MGPIO_voidTogglePin(GPIOA, PIN10);
 			MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_HIGH);
 			secCount++;
@@ -372,20 +410,9 @@ void main()
 			if(secCount==20)
 				HLEDMRX_voidDisplayAsync(LEDMRX_2);
 		}
-
-
-		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2 , MTIMx_CONTEXT2,&local_u8IsCurrDelayAlarmFired))
-			return;
-		if(local_u8IsCurrDelayAlarmFired==TRUE)
-		{
-			/*Clear Alarm*/
-			TIMx_u8ClrAlarmFired(MTIMER_2 , MTIMx_CONTEXT2);
-			local_u8IsCurrDelayAlarmFired=FALSE;
-			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,MTIMx_CONTEXT2, 2500);
-			HLEDMRX_voidMainFunction();
-		}
 	}
 
+#endif
 
 
 

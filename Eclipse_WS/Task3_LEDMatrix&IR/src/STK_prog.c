@@ -48,6 +48,9 @@ void MSTK_voidInit(void)
 
 void MSTK_voidSetBusyWait( u32 Copy_u32Ticks )
 {
+	if(Copy_u32Ticks>MSTK_MAX_LOADTICKS)
+		return;
+
 	/* Load ticks to load register */
 	MSTK -> LOAD = Copy_u32Ticks;
 	
@@ -66,6 +69,9 @@ void MSTK_voidSetBusyWait( u32 Copy_u32Ticks )
 
 void MSTK_voidSetIntervalSingle  ( u32 Copy_u32Ticks, void (*Copy_ptr)(void) )
 {
+	if(Copy_u32Ticks>MSTK_MAX_LOADTICKS)
+		return;
+
 	/* Disable STK Interrupt */
 	CLR_BIT(MSTK->CTRL, 1);
 
@@ -94,6 +100,9 @@ void MSTK_voidSetIntervalSingle  ( u32 Copy_u32Ticks, void (*Copy_ptr)(void) )
 
 void MSTK_voidSetIntervalPeriodic( u32 Copy_u32Ticks, void (*Copy_ptr)(void) )
 {
+	if(Copy_u32Ticks>MSTK_MAX_LOADTICKS)
+		return;
+
 	/* Load ticks to load register */
 	MSTK -> LOAD = Copy_u32Ticks;
 	
@@ -121,13 +130,9 @@ void MSTK_voidStopInterval(void)
 	MSTK -> VAL  = 0;
 }
 
-u32  MSTK_u32GetElapsedTime(void)
+u32 MSTK_u32GetElapsedTime(void)
 {
-	u32 Local_u32ElapsedTime;
-	
-	Local_u32ElapsedTime = MSTK -> LOAD - MSTK -> VAL ;
-	
-	return Local_u32ElapsedTime;
+	return ((uint32) (MSTK -> LOAD - MSTK -> VAL));
 }
 
 u32  MSTK_u32GetRemainingTime(void)
