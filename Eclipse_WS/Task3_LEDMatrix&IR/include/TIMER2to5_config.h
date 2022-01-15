@@ -26,9 +26,9 @@
          at t=400ms	then when first alarm's ISR comes it will be only 600ms passed, which will
          make alarm miss a value of 400ms
  Conclusion: trade off balance must be made when choosing tick value*/
-#define TIM2_BASETICK_Ms		(2500ul)
-#define TIM3_BASETICK_Ms		(2500ul)
-#define TIM4_BASETICK_Ms		(2500ul)
-#define TIM5_BASETICK_Ms		(2500ul)
+#define TIM2_BASETICK_Ms		(500ul)
+#define TIM3_BASETICK_Ms		(500ul)
+#define TIM4_BASETICK_Ms		(500ul)
+#define TIM5_BASETICK_Ms		(500ul)
 
 #endif

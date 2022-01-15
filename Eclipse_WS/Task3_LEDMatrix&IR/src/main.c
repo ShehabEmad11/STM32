@@ -70,8 +70,19 @@
 #define APP_HAMADABALL	(1)
 #define APP_TEXTDISP	(2)
 #define APPLICATION		APP_TEXTDISP
-#define BSW_CONTEXT		MTIMx_CONTEXT1
-#define APP_CONTEXT		MTIMx_CONTEXT2
+
+
+//TODO: make Alarms cyclic by default and has stopper functions and must check if ongoing Timx periodic
+#define BSW_CONTEXT					(MTIMx_CONTEXT0)
+#define	BSW_CYCLIC_PERIOD_Ms		(2500ul)			 //(minimum for LEDMRX))
+#define APP_CONTEXT					(MTIMx_CONTEXT1)
+#define	APP_CYCLIC_PERIOD_Ms		(2500ul)
+
+/*Check that configured time cycles is more than TIMx Period or is not multiple of it*/
+#if ((BSW_CYCLIC_PERIOD_Ms < 2500)  ||  (APP_CYCLIC_PERIOD_Ms < 2500) || (BSW_CYCLIC_PERIOD_Ms % 2500 != 0) || (APP_CYCLIC_PERIOD_Ms % 2500 != 0))
+#error Wrong TASKs cyclic time Configured
+#endif
+
 
 uint8 AppPlayFlag=0;
 
@@ -298,12 +309,6 @@ static void App_voidReadAndReact(u8* DataQ)
  * 	 2.1)then frame is already received we don't need to wait and we read it
  * 	 2.2)act on it by displaying it for 108ms
  */
-
-
-
-
-
-
 void main()
  {
 	//This array to be removed after debugging and check on local var no need to array
@@ -342,73 +347,81 @@ void main()
 
 	MNVIC_voidInit();
 
-	MNVIC_voidEnableInterrupt(TIM2_NVICPOS);
+	MNVIC_voidEnableInterrupt(NVICPOS_TIM2);
 
 
-
-	//TODO:Remove LEDMRX context timer and depend on main timer here
 	//TODO: check if next function call to be moved------>Could be moved to TIM init or as system init and Tim2 be considered OS timer which don't needs input arguments at call
-	/*Set Timer each 2500Ms*/
-	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 2500, MTIM2_voidCountAndFireTIM2Alarms);
+	//TODO: Get 500 from TIMx config/interface
+	/*Set Timer each 500Ms*/
+	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 500, MTIM2_voidCountAndFireTIM2Alarms);
 
 
 	/*ALARM for Core Functions (BSW main functions)*/
-	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,BSW_CONTEXT, 2500);
+	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,BSW_CONTEXT, BSW_CYCLIC_PERIOD_Ms);
 
 
 	/*Alarm for Application*/
-	//MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,APP_CONTEXT, 500);
+	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,APP_CONTEXT, APP_CYCLIC_PERIOD_Ms);
 
 
-	while(1)
-	{
+#if 1
+	//HLEDMRX_voidDisplayAsync(LEDMRX_E);
+	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_F,10000000);
 
-	}
-#if 0
-	HLEDMRX_voidDisplayShiftingAsync(LEDMRX_E,125000);
 	while (1)
 	{
+/*===========================================Run BSW=======================================*/
+/*===========================================Run BSW=======================================*/
+/*===========================================Run BSW=======================================*/
+
 		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2, BSW_CONTEXT, &local_u8IsCurrDelayAlarmFired))
 			return;
 		if(local_u8IsCurrDelayAlarmFired==TRUE)
 		{
-			/*Each increment corresponds to value TIM2_BASETICK_Ms passed*/
+			/*Each increment corresponds to value BSW ALARM BASETICK_Ms passed*/
 			local_u32BSWBaseTicksCounter++;
 			local_u8IsCurrDelayAlarmFired=FALSE;
 
-			/*Reset Alarm*/
-			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, BSW_CONTEXT, 500);
+			/*Reset Alarm -it also clears previous alarm- (i.e no need to call clear func.)*/
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, BSW_CONTEXT, BSW_CYCLIC_PERIOD_Ms);
 
-
+			/*Run BSW runnables*/
 			HLEDMRX_voidMainFunction();
 		}
 
+
+/*======================================Run Application===================================*/
+/*======================================Run Application===================================*/
+/*======================================Run Application===================================*/
 
 
 		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2, APP_CONTEXT, &local_u8IsCurrDelayAlarmFired))
 			return;
 		if(local_u8IsCurrDelayAlarmFired==TRUE)
 		{
-			/*Each increment corresponds to value TIM2_BASETICK_Ms passed*/
+			/*Each increment corresponds to value APP ALARM BASETICK_Ms passed*/
 			local_u32APPBaseTicksCounter++;
 			local_u8IsCurrDelayAlarmFired=FALSE;
 
-			/*Reset Alarm*/
-			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, APP_CONTEXT, 500);
-
+			/*Reset Alarm -it also clears previous alarm- (i.e no need to call clear func.)*/
+			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, APP_CONTEXT, APP_CYCLIC_PERIOD_Ms);
 
 			//MGPIO_voidTogglePin(GPIOA, PIN10);
 			MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_HIGH);
-			secCount++;
-			/*Change LEDMRX display before its time is out during runtime */
-			if(secCount==10)
+
+			/*After 15 seconds*/
+			if(local_u32APPBaseTicksCounter==6000)
 			{
-				HLEDMRX_voidRequestStop();
-				MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_LOW);
+				//HLEDMRX_voidRequestStop();
+				//HLEDMRX_voidDisplayShiftingAsync(LEDMRX_F,960000);
 			}
 
-			if(secCount==20)
-				HLEDMRX_voidDisplayAsync(LEDMRX_2);
+			/*After 30 seconds*/
+			if(local_u32APPBaseTicksCounter==12000)
+			{
+				//HLEDMRX_voidRequestStop();
+				MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_LOW);
+			}
 		}
 	}
 

@@ -20,7 +20,8 @@ typedef struct
 	uint8  IsAlarmFired;
 }TIMxContext_t;
 
-//Context0 ---->Used by LEDMRXs
+//Context0 ---->Used by BSW
+//Context1 ---->Used by APP
 static TIMxContext_t TIMx_astrAlarmContext[4][TIMR2to5_MAXCONTEXTS];
 
 /* Define static global Variable for interval mode */
@@ -249,7 +250,7 @@ extern void MTIMR2to5_voidStopInterval(uint8 copy_u8TimerNumber)
 
 extern void MTIMR2to5_voidSetAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u32 copy_u32MsVal)
 {
-	uint32 local_u32ElapsedTime=0;
+	uint16 local_u16ElapsedTime=0;
 
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
 		return;
@@ -260,11 +261,11 @@ extern void MTIMR2to5_voidSetAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNum
 	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
 	/*Check the time already passed from current TIMx ISR*/
-	if(E_OK != MTIMR2to5_u8GetElapsedTime(copy_u8TimerNumber, &local_u32ElapsedTime))
+	if(E_OK != MTIMR2to5_u8GetElapsedTime(copy_u8TimerNumber, &local_u16ElapsedTime))
 		return;
 
 	/*If more than 50% of current TIMx ISR has passed then we need to more one extra ISR */
-	if(local_u32ElapsedTime > (TIMx_ArrBaseTick[copy_u8TimerNumber] / 2ul))
+	if(local_u16ElapsedTime > (TIMx_ArrBaseTick[copy_u8TimerNumber] / 2ul))
 	{
 		copy_u32MsVal += TIMx_ArrBaseTick[copy_u8TimerNumber];
 	}
