@@ -12,13 +12,7 @@
 #include "TIMER2to5_config.h"
 
 
-typedef struct
-{
-	uint32 AlarmVal_Ms;
-	uint32 TimePassed_Ms;
-	uint8  IsAlarmSet;
-	uint8  IsAlarmFired;
-}TIMxContext_t;
+
 
 //Context0 ---->Used by BSW
 //Context1 ---->Used by APP
@@ -51,6 +45,7 @@ extern void MTIMR2to5_voidInit(u8 copy_u8TimerNumber, u16 copy_u16Prescaler)
 		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].TimePassed_Ms=0;
 		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].IsAlarmSet=FALSE;
 		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].IsAlarmFired=FALSE;
+		TIMx_astrAlarmContext[copy_u8TimerNumber][ContextIterator].IsMissedShot=FALSE;
 	}
 
 	 /*Use internal clock as clock source for the timer::
@@ -218,18 +213,18 @@ extern void MTIMR2to5_voidStopInterval(uint8 copy_u8TimerNumber)
 		return;
 
 	/*Disable Update Interrupt*/
-	CLR_BIT(TIMx[0]->DIER,0);
+	CLR_BIT(TIMx[copy_u8TimerNumber]->DIER,0);
 	/*Clear Flag*/
-	CLR_BIT(TIMx[0]->SR,0);
+	CLR_BIT(TIMx[copy_u8TimerNumber]->SR,0);
 	/*Disable Counter */
-	CLR_BIT(TIMx[0]->CR1,0);
+	CLR_BIT(TIMx[copy_u8TimerNumber]->CR1,0);
 	/*Reset Auto Reload Register*/
-	TIMx[0]-> ARR = 0;
+	TIMx[copy_u8TimerNumber]-> ARR = 0;
 	/*Reset Counter Register (no need as it will be reset when next Set-interval called)*/
-	TIMx[0]-> CNT = 0;
+	TIMx[copy_u8TimerNumber]-> CNT = 0;
 
 	/*Reset callBack*/
-	TIMx_ArrPtrCallBack[0]=NULL;
+	TIMx_ArrPtrCallBack[copy_u8TimerNumber]=NULL;
 }
 
 
@@ -247,8 +242,7 @@ extern void MTIMR2to5_voidStopInterval(uint8 copy_u8TimerNumber)
          at t=400ms	then when first alarm's ISR comes it will be only 600ms passed, which will
          make alarm miss a value of 400ms
  Conclusion: trade off balance must be made when choosing tick value*/
-
-extern void MTIMR2to5_voidSetAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u32 copy_u32MsVal)
+extern void MTIMR2to5_voidSetCycAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u32 copy_u32MsVal)
 {
 	uint16 local_u16ElapsedTime=0;
 
@@ -256,6 +250,10 @@ extern void MTIMR2to5_voidSetAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNum
 		return;
 	if(copy_u8TimerNumber>MTIMER_5)
 		return ;
+
+	/*Alarm can't be less than the set Periodic Interval Timer*/
+	if(copy_u32MsVal < TIMx[copy_u8TimerNumber]-> ARR )
+		return;
 
 	/*Update Timer number to match with array in private file*/
 	//copy_u8TimerNumber=copy_u8TimerNumber-2;
@@ -274,34 +272,45 @@ extern void MTIMR2to5_voidSetAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8ContextNum
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].AlarmVal_Ms=copy_u32MsVal;
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].TimePassed_Ms=0;
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmFired=FALSE;
+	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsMissedShot=FALSE;
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmSet=TRUE;
 }
 
 
-
-extern void MTIM2_voidCountAndFireTIM2Alarms(void)
+extern void MTIMR2to5_voidHandleTIM2CycAlarms(void)
 {
 	u8 ContextIterator;
 
 	for(ContextIterator=0;ContextIterator<TIMR2to5_MAXCONTEXTS;ContextIterator++)
 	{
-		if(	TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmSet==TRUE
-		&&  TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmFired==FALSE 	)
+		if(	TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmSet==TRUE )
 		{
 			TIMx_astrAlarmContext[MTIMER_2][ContextIterator].TimePassed_Ms += TIM2_BASETICK_Ms;
 
 			if(TIMx_astrAlarmContext[MTIMER_2][ContextIterator].TimePassed_Ms
 			>= TIMx_astrAlarmContext[MTIMER_2][ContextIterator].AlarmVal_Ms )
 			{
+				/*Reset alarm as it is cyclic*/
+				TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmSet=TRUE;
+
+				/*Reset Time passed to re-count cyclic again*/
+				TIMx_astrAlarmContext[MTIMER_2][ContextIterator].TimePassed_Ms=0;
+
+				/*If alarm was already fired here this means that Alarm wasn't cleared from
+				   app. context (either due to delay in execution or logic error in design)*/
+				if(FALSE != TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmFired)
+				{
+					TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsMissedShot=TRUE;
+				}
+				/*Flag fired Alarm, it should be cleared from APP context*/
 				TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmFired=TRUE;
-				TIMx_astrAlarmContext[MTIMER_2][ContextIterator].IsAlarmSet=FALSE;
 			}
 		}
 	}
 }
 
 
-extern u8 TIMx_u8IsAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u8* copy_Ptr2u8AlarmState)
+extern u8 MTIMR2to5_u8GetAlarmInfo(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,TIMxContext_t* copy_ptrAlarmInfo)
 {
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
 		return E_NOT_OK;
@@ -311,27 +320,40 @@ extern u8 TIMx_u8IsAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber,u8* 
 	/*Update Timer number to match with array in private file*/
 	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
-	*copy_Ptr2u8AlarmState= TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmFired;
+	*copy_ptrAlarmInfo= TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber];
 
 	return E_OK;
 }
 
-extern u8 TIMx_u8ClrAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber)
+extern void MTIMR2to5_voidClrAlarmFired(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber)
 {
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
-		return E_NOT_OK;
+		return ;
 	if(copy_u8TimerNumber>MTIMER_5)
-		return E_NOT_OK;
+		return ;
 
 	/*Update Timer number to match with array in private file*/
 	//copy_u8TimerNumber=copy_u8TimerNumber-2;
 
 	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsAlarmFired=FALSE;
 
-	return E_OK;
+	return;
 }
 
+extern void MTIMR2to5_voidClrAlarmMissedShot(u8 copy_u8TimerNumber,u8 copy_u8ContextNumber)
+{
+	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
+		return ;
+	if(copy_u8TimerNumber>MTIMER_5)
+		return ;
 
+	/*Update Timer number to match with array in private file*/
+	//copy_u8TimerNumber=copy_u8TimerNumber-2;
+
+	TIMx_astrAlarmContext[copy_u8TimerNumber][copy_u8ContextNumber].IsMissedShot=FALSE;
+
+	return;
+}
 
 void TIM2_IRQHandler(void)
 {

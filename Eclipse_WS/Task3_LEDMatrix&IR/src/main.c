@@ -316,9 +316,8 @@ void main()
 	u8 AddresQ,DataQ[1]={0},local_u8ExtractIRDataFlag=0;
 	u8 j=0,i=0;
 	volatile u16 local_u16msCounter;
-	uint8 local_u8IsCurrDelayAlarmFired=FALSE;
+	TIMxContext_t local_strCurrAlarmInfo;
 
-	u8 local_u8IsAlarmFired0=FALSE,local_u8IsAlarmFired1=FALSE,local_u8IsAlarmFired2=FALSE,local_u8IsAlarmFired3=FALSE,local_u8IsAlarmFired4=FALSE;
 	u8 secCount=0;
 
 	uint32 local_u32BSWBaseTicksCounter=0,local_u32APPBaseTicksCounter=0;		//Every increment= TIM2_BASETICK_Ms
@@ -353,15 +352,15 @@ void main()
 	//TODO: check if next function call to be moved------>Could be moved to TIM init or as system init and Tim2 be considered OS timer which don't needs input arguments at call
 	//TODO: Get 500 from TIMx config/interface
 	/*Set Timer each 500Ms*/
-	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 500, MTIM2_voidCountAndFireTIM2Alarms);
+	MTIMR2to5_voidSetTimerPeriodic(MTIMER_2, 500, MTIMR2to5_voidHandleTIM2CycAlarms);
 
 
 	/*ALARM for Core Functions (BSW main functions)*/
-	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,BSW_CONTEXT, BSW_CYCLIC_PERIOD_Ms);
+	MTIMR2to5_voidSetCycAlarm_Ms(MTIMER_2,BSW_CONTEXT, BSW_CYCLIC_PERIOD_Ms);
 
 
 	/*Alarm for Application*/
-	MTIMR2to5_voidSetAlarm_Ms(MTIMER_2,APP_CONTEXT, APP_CYCLIC_PERIOD_Ms);
+	MTIMR2to5_voidSetCycAlarm_Ms(MTIMER_2,APP_CONTEXT, APP_CYCLIC_PERIOD_Ms);
 
 
 #if 1
@@ -374,16 +373,26 @@ void main()
 /*===========================================Run BSW=======================================*/
 /*===========================================Run BSW=======================================*/
 
-		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2, BSW_CONTEXT, &local_u8IsCurrDelayAlarmFired))
-			return;
-		if(local_u8IsCurrDelayAlarmFired==TRUE)
+		if(E_NOT_OK==MTIMR2to5_u8GetAlarmInfo(MTIMER_2, BSW_CONTEXT, &local_strCurrAlarmInfo))
+			return; //error
+		if(TRUE == local_strCurrAlarmInfo.IsAlarmFired)
 		{
+			if(TRUE == local_strCurrAlarmInfo.IsMissedShot)
+			{
+				MTIMR2to5_voidClrAlarmMissedShot(MTIMER_2, BSW_CONTEXT);
+				asm("nop");//Error
+				return;
+			}
+
+			/*Clear Alarm Fired*/
+			MTIMR2to5_voidClrAlarmFired(MTIMER_2, BSW_CONTEXT);
+
+			/*Clear Local Flag*/
+			local_strCurrAlarmInfo.IsAlarmFired = FALSE;
+
 			/*Each increment corresponds to value BSW ALARM BASETICK_Ms passed*/
 			local_u32BSWBaseTicksCounter++;
-			local_u8IsCurrDelayAlarmFired=FALSE;
 
-			/*Reset Alarm -it also clears previous alarm- (i.e no need to call clear func.)*/
-			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, BSW_CONTEXT, BSW_CYCLIC_PERIOD_Ms);
 
 			/*Run BSW runnables*/
 			HLEDMRX_voidMainFunction();
@@ -395,16 +404,26 @@ void main()
 /*======================================Run Application===================================*/
 
 
-		if(E_NOT_OK==TIMx_u8IsAlarmFired(MTIMER_2, APP_CONTEXT, &local_u8IsCurrDelayAlarmFired))
-			return;
-		if(local_u8IsCurrDelayAlarmFired==TRUE)
+		if(E_NOT_OK==MTIMR2to5_u8GetAlarmInfo(MTIMER_2, APP_CONTEXT, &local_strCurrAlarmInfo))
+			return; //error
+		if(TRUE == local_strCurrAlarmInfo.IsAlarmFired)
 		{
+			if(TRUE == local_strCurrAlarmInfo.IsMissedShot)
+			{
+				MTIMR2to5_voidClrAlarmMissedShot(MTIMER_2, APP_CONTEXT);
+				asm("nop");//Error
+				return;
+			}
+
+			/*Clear Alarm Fired*/
+			MTIMR2to5_voidClrAlarmFired(MTIMER_2, APP_CONTEXT);
+
+			/*Clear Local Flag*/
+			local_strCurrAlarmInfo.IsAlarmFired = FALSE;
+
 			/*Each increment corresponds to value APP ALARM BASETICK_Ms passed*/
 			local_u32APPBaseTicksCounter++;
-			local_u8IsCurrDelayAlarmFired=FALSE;
 
-			/*Reset Alarm -it also clears previous alarm- (i.e no need to call clear func.)*/
-			MTIMR2to5_voidSetAlarm_Ms(MTIMER_2, APP_CONTEXT, APP_CYCLIC_PERIOD_Ms);
 
 			//MGPIO_voidTogglePin(GPIOA, PIN10);
 			MGPIO_voidSetPinValue(GPIOA, PIN10, GPIO_HIGH);
