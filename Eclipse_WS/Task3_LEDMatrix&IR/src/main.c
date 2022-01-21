@@ -65,14 +65,14 @@
 #endif
 
 
-//u32 FRAME_P[40]={0,0,0,13754, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270, 2246, 2271, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220};
-//u32 FRAME_M[40]={0,0,0,13685, 1134, 1134, 1133, 1133, 1134, 1133, 1134, 1134, 2248, 2248, 2247, 2246, 2248, 2246, 2246, 2246, 1133, 2246, 2246, 1133, 1134, 1133, 2246, 1134, 2246, 1134, 1134, 2247, 2246, 2246, 1133, 2247};
+//u32 FRAME_P[40]={0,0,0,13754, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270, 2246, 2271, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220 ,0 ,0 ,0};
+//u32 FRAME_M[40]={0,0,0,13685, 1134, 1134, 1133, 1133, 1134, 1133, 1134, 1134, 2248, 2248, 2247, 2246, 2248, 2246, 2246, 2246, 1133, 2246, 2246, 1133, 1134, 1133, 2246, 1134, 2246, 1134, 1134, 2247, 2246, 2246, 1133, 2247 ,0 ,0 ,0};
 
-u32 FRAME_P[40]={0,0,0,0,0,0,0, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220,13754, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270, 2246, 2271};
-u32 FRAME_M[40]={0,0,0,0,0,0,0,2246, 2248, 2246, 2246, 2246, 1133, 2246, 2246, 1133, 1134, 1133, 2246, 1134, 2246, 1134, 1134, 2247, 2246, 2246, 1133, 2247,13685, 1134, 1134, 1133, 1133, 1134, 1133, 1134, 1134, 2248, 2248, 2247, };
+u32 FRAME_P[40]={2246, 2271, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220,0,0,0,200,0,0,0,13754, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270};
+u32 FRAME_M[40]={2246, 2248, 2246, 2246, 2246, 1133, 2246, 2246, 1133, 1134, 1133, 2246, 1134, 2246, 1134, 1134, 2247, 2246, 2246, 1133, 2247,0,0,0,0,400,0,0,13685, 1134, 1134, 1133, 1133, 1134, 1133, 1134, 1134, 2248, 2248, 2247};
 
 
-extern u32 testbuff[40];
+extern volatile u32 testbuff[40];
 
 
 void _vidSettestbuff(u8 frameno)
@@ -104,6 +104,7 @@ u8 frameno=0;
 #error Wrong TASKs cyclic time Configured
 #endif
 
+#define TESTING
 
 uint8 AppPlayFlag=0;
 
@@ -210,6 +211,7 @@ void main()
 	 */
 	//TODO: clear overflow flag after making sure of all
 	//TODO: re-check of localstaticindex increment step after overflow case
+	//TODO: check boundaries of IR_MAXSIGNAL & #define IR_type
 
 
 
@@ -245,7 +247,11 @@ void main()
 	/*Alarm for Application*/
 	MTIMR2to5_voidSetCycAlarm_Ms(MTIMER_2,APP_CONTEXT, APP_CYCLIC_PERIOD_Ms);
 
-
+#undef TESTING
+#if defined TESTING
+	if(HIR_voidSetUsedBufferAddress(&testbuff[0],sizeof(testbuff)/sizeof(u32) != E_OK);
+		return;
+#endif
 #if 1
 	//HLEDMRX_voidDisplayAsync(LEDMRX_E);
 	//HLEDMRX_voidDisplayShiftingAsync(LEDMRX_F,10000000);
@@ -435,6 +441,18 @@ void main()
 						TOG_BIT(frameno,0);
 						//break;
 					}
+					else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
+					{
+						/*Save Last Received Data*/
+						local_tempLastDataQ=DataQ[j];
+						App_voidReadAndReact(DataQ[j]);
+						/*Don't Break loop keep getting data*/
+						i++;
+						j++;
+
+						_vidSettestbuff(frameno);
+						TOG_BIT(frameno,0);
+					}
 					else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
 					{
 						/*Handle following cases:
@@ -471,19 +489,10 @@ void main()
 						i++;
 						j++;
 					}
-					else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
-					{
-						/*Save Last Received Data*/
-						local_tempLastDataQ=DataQ[j];
-						App_voidReadAndReact(DataQ[j]);
-						/*Don't Break loop keep getting data*/
-						i++;
-						j++;
-						_vidSettestbuff(frameno);
-						TOG_BIT(frameno,0);
-					}
+
 					else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
 						asm("nop");  //error
+
 
 					if(i>49)
 					{

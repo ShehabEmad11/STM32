@@ -46,6 +46,7 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 /*Interfaces to Read/Reset Signal buffer which stores time of each signal*/
 extern u8 HIR_u8ReadRawSignalBuffer(u32* DestArr);
 extern void HIR_voidResetRawSignalBuffer(void);
+extern u8 HIR_voidSetUsedBufferAddress(volatile u32* copy_PtrToBuffer,u16 BuffSize);
 
 /*Interfaces to check/clear frame's start or repeated frame is received*/
 extern u8 HIR_u8GetIsStart(void);
