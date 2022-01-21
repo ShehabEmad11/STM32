@@ -114,33 +114,47 @@ extern void HIR_voidReceiveFrameNEC(void)
  it should be recalled from the calling function once if it returns one of the following codes: IR_DATA_EXTRACTED_PARTIALBUF , IR_DATA_REPEATEXTRACTED_PARTIALBUF
  it returns the following codes in general:
 *First:
-	 * Return IR_DATA_NO_VALID_DATA==0 if there isn't a valid IR_Frame
+	 * Return IR_DATA_NO_VALID_DATA_EMPTYBUF==0 if all buffer checked & there isn't a valid IR_Frame
 *Second:
-	 * Return IR_DATA_EXTRACTED_EMPTYBUF==1 we have got Valid Frame extracted and no more data in buffer to be extracted
+	 * Return IR_DATA_NO_VALID_DATA_PARTIALBUF==1 if all buffer checked & there isn't a valid IR_Frame
 *Third:
-	 * Return IR_DATA_EXTRACTED_PARTIALBUF==2 if we have got valid frame extracted and more frames needs to be checked Still in buffer
+	 * Return IR_DATA_EXTRACTED_EMPTYBUF==2 we have got Valid Frame extracted and no more data in buffer to be extracted
 *Fourth:
-	 * Return IR_DATA_REPEATEXTRACTED_EMPTYBUF==3 if we have got valid repeated frame extracted and no more data in buffer to be extracted
+	 * Return IR_DATA_EXTRACTED_PARTIALBUF==3 if we have got valid frame extracted and more frames needs to be checked Still in buffer
 *Fifth:
-	 * Return IR_DATA_REPEATEXTRACTED_PARTIALBUF==4 if we have got valid repeated frame extracted and more data Frames in buffer to be checked
-*Sixth
+	 * Return IR_DATA_REPEATEXTRACTED_EMPTYBUF==4 if we have got valid repeated frame extracted and no more data in buffer to be extracted
+*Sixth:
+	 * Return IR_DATA_REPEATEXTRACTED_PARTIALBUF==5 if we have got valid repeated frame extracted and more data Frames in buffer to be checked
+*Seventh
 	 * Return IR_LOGICERROR==88
-*Seventh:
+*Eighth:
 	 * Return IR_IMPOSSIBLETRET as default which couldn't happen
-*Eighth: __CANCELLED__
+*Ninth:	  __CANCELLED__
      * Return IR_DATA_OVERFLOWBUF==77 if buffer overflow occurs
-*Ninth:   __CANCELLED__
+*Tenth:   __CANCELLED__
 	 * Return IR_DATA_NON_RECEIVED==99 if there is no flag of received data was raised(Functional Call without check if global_u8IRFrameReceivedFlag is raised)*/
-extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData)
+#define EFRAME 			0,0,0,13500, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270, 2246, 2271, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220,0,0,0
+	u32 testbuff[IR_MAXSIGNALBUFFER]={EFRAME};
+extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData)
 {
+
+#include "TIMER2to5_interface.h"
+	void temp (void)
+	{
+		asm("nop");
+		return;
+	}
+	u16 mstkelapsed1=0;
 	static ir_type_index local_staticCurrentBufferIndex=0;
 	static u8 local_u8StaticDataExtractedFlag=0;
+#if 0
 	static u32* local_u32StaticPtrBuffer=0;
+#endif
 	u8 local_u8AllBufferCheckedFlag=0;
 	u8 local_u8FrameStatus=IR_FRAMESTATUS_INVALID;
 	volatile u32 tempBuf[33]={0};
 
-
+#if 0
 	/*This Function depends on being Called/Re-called if their is still data in buffer unchecked
 	 * But what if when we recall the function it is called for different buffer? then:
 	   we have to reset the static flags and static indexes */
@@ -155,8 +169,10 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 			local_u8StaticDataExtractedFlag=0;
 		}
 	}
+#endif
 
-	while((u32)local_staticCurrentBufferIndex + 1ul <= (u32)IR_MAXSIGNALBUFFER)
+	//MTIMR2to5_voidSetTimerSingle(MTIMER_4, 65500, temp);
+	if((u32)local_staticCurrentBufferIndex + 1ul <= (u32)IR_MAXSIGNALBUFFER)
 	{
 
 		/*THE Received flag is SET by MSTK_Interrupt callback under some conditions
@@ -170,8 +186,8 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 		}
 #endif
 		/*Get The Current Frame Status (VALID,Repeated,UnValid)*/
-		_voidCopyFrame((u32*)tempBuf,(u32*)globalstatic_u32IRArrSignalTime,local_staticCurrentBufferIndex);
-		local_u8FrameStatus=HIR_u8FrameCheckNEC(0,tempBuf);
+		_voidCopyFrame((u32*)tempBuf,(u32*)testbuff,local_staticCurrentBufferIndex);
+		local_u8FrameStatus=_u8FrameCheckNEC(0,tempBuf);
 
 		if(local_u8FrameStatus==IR_LOGICERROR)
 			return IR_LOGICERROR;
@@ -203,7 +219,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 				{
 					local_staticCurrentBufferIndex += IR_FRAMEBITLENGTH;
 				}
-				break;
+//				break;
 			}
 			else
 			{
@@ -234,7 +250,7 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 			{
 				local_staticCurrentBufferIndex += IR_REPEATEDFRAMEBITLENGTH;
 			}
-			break;
+//			break;
 		}
 		else
 		{
@@ -251,7 +267,10 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 			}
 		}
 	}
-
+//	MTIMR2to5_u8GetElapsedTime(MTIMER_4, (u16*)(&mstkelapsed1));
+	//dbg
+//	local_staticCurrentBufferIndex=0;
+//	local_u8AllBufferCheckedFlag=1;
 	/*
 	 *after loop ends and this should be checked by calling function -indicated by returned value-
 	 *There are two reasons for while loop to end
@@ -268,10 +287,11 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 		local_staticCurrentBufferIndex=0;
 		/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
 		local_u8AllBufferCheckedFlag=1;
+#if 0
 		/*Reset the static buffer to indicate that the next function call is new call
 		 * with new buffer even it is the same buffer we start over*/
 		local_u32StaticPtrBuffer=0;
-
+#endif
 		if(globalstatic_u8OverFlowFlag==0)
 		{
 			/*Clear Received Flag to indicate no more data in buffer to be extracted*/
@@ -281,15 +301,25 @@ extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtr
 		}
 	}
 
-	/* it is not possible to not receive any data and didn't finish all buffer and you reached here
-	 * so no case in which DataExtractedFlag and BufferCheckedFlag both are zero */
 
-	/* Case 1: we finished the buffer and we didn't got data in this run
-	 * return IR_DATA_NO_VALID_DATA*/
-	if((local_u8FrameStatus==IR_FRAMESTATUS_INVALID) && local_u8AllBufferCheckedFlag==1)
+	/* Case 1: We didn't got valid data */
+	if((local_u8FrameStatus==IR_FRAMESTATUS_INVALID))
 	{
-		local_u32StaticPtrBuffer=0;
-		return IR_DATA_NO_VALID_DATA;
+		/* Case 1.1: we finished the buffer and we didn't got valid data
+		 * return IR_DATA_NO_VALID_DATA_EMPTYBUF*/
+		if(local_u8AllBufferCheckedFlag==1)
+		{
+	#if 0
+			local_u32StaticPtrBuffer=0;
+	#endif
+			return IR_DATA_NO_VALID_DATA_EMPTYBUF;
+		}
+		/* Case 1.2: we finished the buffer and we didn't got valid data
+		 * return IR_DATA_NO_VALID_DATA_PARTIALBUF*/
+		else if(local_u8AllBufferCheckedFlag==0)
+		{
+			return IR_DATA_NO_VALID_DATA_PARTIALBUF;
+		}
 	}
 	/*Case 2: If this was valid frame which we returned by now */
 	else if( (local_u8FrameStatus==IR_FRAMESTATUS_VALID) && local_u8StaticDataExtractedFlag )
@@ -511,7 +541,7 @@ static void _voidCopyFrame(u32* Dest,u32 *Src,u8 SrcStartIndex)
 }
 
 
-extern u8 HIR_u8FrameCheckNEC(ir_type_index copy_irFrameStartIndex,volatile u32* copy_u32PtrBuffer)
+static u8 _u8FrameCheckNEC(ir_type_index copy_irFrameStartIndex,volatile u32* copy_u32PtrBuffer)
 {
 	ir_type_index local_irFrameAddressStartIndex,local_irFrameDataStartIndex;
 
@@ -703,3 +733,250 @@ static u8 _u8GetFrameData(volatile u32* copy_u32PtrBuffer,ir_type_index copy_sta
 
 	return 1;
 }
+
+
+
+
+
+//Before chanGing function to only check one buffer pos per entry
+#if 0
+extern u8 HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData)
+{
+#define EFRAME 			13500, 1106, 1107, 1131, 1131, 1134, 1159, 1081, 1186, 2244, 2193, 2270, 2246, 2271, 2248, 2192, 2297, 2218, 1157, 2222, 1131, 1104, 1160, 2272, 1159, 1107, 2245, 1135, 2243, 2219, 2272, 1107, 2220
+	u32 testbuff[33]={EFRAME};
+#include "TIMER2to5_interface.h"
+	void temp (void)
+	{
+		asm("nop");
+		return;
+	}
+	u16 mstkelapsed1=0;
+	static ir_type_index local_staticCurrentBufferIndex=0;
+	static u8 local_u8StaticDataExtractedFlag=0;
+#if 0
+	static u32* local_u32StaticPtrBuffer=0;
+#endif
+	u8 local_u8AllBufferCheckedFlag=0;
+	u8 local_u8FrameStatus=IR_FRAMESTATUS_INVALID;
+	volatile u32 tempBuf[33]={0};
+
+#if 0
+	/*This Function depends on being Called/Re-called if their is still data in buffer unchecked
+	 * But what if when we recall the function it is called for different buffer? then:
+	   we have to reset the static flags and static indexes */
+	/*If the function used for some buffer before:*/
+	if(local_u32StaticPtrBuffer!=0)
+	{
+		/*And if the new buffer not the same as the old one....*/
+		if(local_u32StaticPtrBuffer!=globalstatic_u32IRArrSignalTime)
+		{
+			/*Reset Flags and indexes*/
+			local_staticCurrentBufferIndex=0;
+			local_u8StaticDataExtractedFlag=0;
+		}
+	}
+#endif
+
+	while((u32)local_staticCurrentBufferIndex + 1ul <= (u32)IR_MAXSIGNALBUFFER)
+	{
+
+		/*THE Received flag is SET by MSTK_Interrupt callback under some conditions
+		  and cleared when the buffer is fully read by this function*/
+#if 0
+		if( global_u8IRFrameReceivedFlag==0)
+		{
+			/*Function called while their is no data received
+			 * -the caller forgot to check received data flag-*/
+			return IR_DATA_NON_RECEIVED;
+		}
+#endif
+		/*Get The Current Frame Status (VALID,Repeated,UnValid)*/
+		_voidCopyFrame((u32*)tempBuf,(u32*)testbuff,local_staticCurrentBufferIndex);
+		local_u8FrameStatus=_u8FrameCheckNEC(0,tempBuf);
+
+		if(local_u8FrameStatus==IR_LOGICERROR)
+			return IR_LOGICERROR;
+
+		/*if the current index is start of Valid*/
+		if(local_u8FrameStatus==IR_FRAMESTATUS_VALID)
+		{
+			/*Return The Address and Data of the current frame through input arguments*/
+			if(_u8GetFrameData(tempBuf,0,copy_u8RetPtrAddress, copy_u8RetPtrData)!=IR_LOGICERROR)
+			{
+				/*Raise flag to indicate that Data Extracted and sent to input arguments*/
+				local_u8StaticDataExtractedFlag=1;
+
+				/*Clear SignalBuffer Range for extracted data to avoid re-extract same values
+				 * Clearing here is better than clearing after buffer filled to avoid
+				 * critical sections*/
+				_voidClearu32BufferRange((u32*)globalstatic_u32IRArrSignalTime,local_staticCurrentBufferIndex,IR_FRAMEBITLENGTH);
+
+				/*Increment the current buffer position and we have to break the loop and
+				  go back to the calling function with flag raised to allow it to store data
+				  and allow it then to recall again so that we continue extract
+				  rest of data still in the buffer*/
+				/*increment the buffer with 33 signal as it was valid frame*/
+				if( (u32)local_staticCurrentBufferIndex+ (u32)IR_FRAMEBITLENGTH  >= (u32)IR_MAXSIGNALBUFFER)
+				{
+					local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+				}
+				else
+				{
+					local_staticCurrentBufferIndex += IR_FRAMEBITLENGTH;
+				}
+				break;
+			}
+			else
+			{
+				return IR_LOGICERROR;
+			}
+		}
+		else if(local_u8FrameStatus==IR_FRAMESTATUS_REPEATED)
+		{
+			/*Raise flag to indicate that Data Extracted But not sent to input Arguments as it is repeated frame*/
+			local_u8StaticDataExtractedFlag=1;
+
+			/*Clear SignalBuffer Range for extracted data to avoid re-extract same values
+			 * Clearing here is better than clearing after buffer filled to avoid
+			 * critical sections*/
+			_voidClearu32BufferRange((u32*)globalstatic_u32IRArrSignalTime,local_staticCurrentBufferIndex,IR_REPEATEDFRAMEBITLENGTH);
+
+
+			/*Increment the current buffer position and we have to break the loop and
+			  go back to the calling function with flag raised to allow it to store data
+			  and allow it then to recall again so that we continue extract
+			  rest of data still in the buffer*/
+			/*increment the buffer with 2 signal as it was repeated frame*/
+			if( (u32)local_staticCurrentBufferIndex+ (u32)IR_REPEATEDFRAMEBITLENGTH  >= (u32)IR_MAXSIGNALBUFFER)
+			{
+				local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+			}
+			else
+			{
+				local_staticCurrentBufferIndex += IR_REPEATEDFRAMEBITLENGTH;
+			}
+			break;
+		}
+		else
+		{
+			/*if we proceeded to here inside loop without break---> this means the following:
+			 *The frame was non-valid and we didn't send back any data through input arguments
+			  so we have to increment current buffer position and continue checking buffer in loop */
+			if( (u32)local_staticCurrentBufferIndex + 1ul  >= (u32)IR_MAXSIGNALBUFFER)
+			{
+				local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+			}
+			else
+			{
+				local_staticCurrentBufferIndex ++;
+			}
+		}
+	}
+
+	/*
+	 *after loop ends and this should be checked by calling function -indicated by returned value-
+	 *There are two reasons for while loop to end
+	 * 1-we extracted at least one valid data and broke the loop
+	 * 2-Signal Buffer fully checked and no valid data found
+	 * 3-the signal buffer was fully checked and data already extracted if available and we verify
+         this in the next if condition then we will have to reset the following flags:
+	     received data flag,data pos, interrupt first occurrence , buffer pos.
+	     and we have to indicate that no more data in buffer*/
+	if(local_staticCurrentBufferIndex+1ul > IR_MAXSIGNALBUFFER)
+	{
+
+		/*Reset Current Buffer Index*/
+		local_staticCurrentBufferIndex=0;
+		/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
+		local_u8AllBufferCheckedFlag=1;
+#if 0
+		/*Reset the static buffer to indicate that the next function call is new call
+		 * with new buffer even it is the same buffer we start over*/
+		local_u32StaticPtrBuffer=0;
+#endif
+		if(globalstatic_u8OverFlowFlag==0)
+		{
+			/*Clear Received Flag to indicate no more data in buffer to be extracted*/
+			//global_u8IRFrameReceivedFlag=0;
+			/*Clear Flag to indicate that the next interrupt fire is considered now the first time*/
+			globalstatic_u8IRInterruptVirginityFlag=0;
+		}
+	}
+
+	/* it is not possible to not receive any data and didn't finish all buffer and you reached here
+	 * so no case in which DataExtractedFlag and BufferCheckedFlag both are zero */
+
+	/* Case 1: we finished the buffer and we didn't got data in this run
+	 * return IR_DATA_NO_VALID_DATA*/
+	if((local_u8FrameStatus==IR_FRAMESTATUS_INVALID) && local_u8AllBufferCheckedFlag==1)
+	{
+#if 0
+		local_u32StaticPtrBuffer=0;
+#endif
+		return IR_DATA_NO_VALID_DATA;
+	}
+	/*Case 2: If this was valid frame which we returned by now */
+	else if( (local_u8FrameStatus==IR_FRAMESTATUS_VALID) && local_u8StaticDataExtractedFlag )
+	{
+		if(local_u8AllBufferCheckedFlag)
+		{
+			/*Case 2.1:
+			 * VALID Frame Returned by now and we have checked all the buffer:
+			 *Then reset DataExtractedFlag & return IR_DATA_EXTRACTED_EMPTYBUF*/
+			local_u8StaticDataExtractedFlag=0;
+			return IR_DATA_EXTRACTED_EMPTYBUF;
+		}
+		else if(local_u8AllBufferCheckedFlag==0)
+		{
+			/*Case 2.2
+			 *Valid frame which we returned by now BUT we didn't finish checking all the buffer:
+			 *Then we return IR_DATA_EXTRACTED_PARTIALBUF to be indicated by calling function to recall again
+			 *Keep the DataExtracted Flag Set to indicate when re-enter function in next call
+			  It is only reset in case of finishing buffer and extracted data
+			  or in case of from the beginning no extract of data happened*/
+			return IR_DATA_EXTRACTED_PARTIALBUF;
+		}
+	}
+	/* Case 3: This was repeated frame which we returned by now*/
+	else if((local_u8FrameStatus==IR_FRAMESTATUS_REPEATED) && local_u8StaticDataExtractedFlag )
+	{
+		if(local_u8AllBufferCheckedFlag)
+		{
+			/*Case 3.1:
+			 * Repeated Frame Returned by now and we have checked all the buffer:
+			 *Then reset DataExtractedFlag & return IR_DATA_REPEATEXTRACTED_EMPTYBUF*/
+			local_u8StaticDataExtractedFlag=0;
+			return IR_DATA_REPEATEXTRACTED_EMPTYBUF;
+		}
+		else if(local_u8AllBufferCheckedFlag==0)
+		{
+			/*Case 3.2
+			 *Repeated frame which we returned by now BUT we didn't finish checking all the buffer:
+			 *Then we return IR_DATA_REPEATEXTRACTED_PARTIALBUF to be indicated by calling function to recall again
+			 *Keep the DataExtracted Flag Set to indicate when re-enter function in next call
+			  It is only reset in case of finishing buffer and extracted data
+			  or in case of from the beginning no extract of data happened*/
+			return IR_DATA_REPEATEXTRACTED_PARTIALBUF;
+		}
+	}
+#if 0
+	else if(globalstatic_u8OverFlowFlag ==1)
+	{
+		/*THE Received flag is SET by MSTK_Interrupt callback under some conditions
+		  and cleared when the buffer is fully read by this function
+		 *The following condition handles case:
+		   *-Data received and written to buffer until buffer overflow occur disabled as it is handled by another method*/
+		return IR_DATA_OVERFLOWBUF;
+	}
+#endif
+	else
+	{
+		asm("nop");
+		return IR_LOGICERROR;
+	}
+
+	/*Default which will not occur*/
+	return IR_IMPOSSIBLETRET;
+}
+
+#endif

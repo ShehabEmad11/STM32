@@ -16,7 +16,7 @@
 #define IR_MAXTICKSTOOUT		(115000ul)
 
 /*The Maximum number of signal times stored*/
-#define IR_MAXSIGNALBUFFER				(255u)
+#define IR_MAXSIGNALBUFFER				(40u)
 #define IR_FRAMEBITLENGTH				(33u)
 #define IR_REPEATEDFRAMEBITLENGTH		(2u)
 

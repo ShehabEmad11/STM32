@@ -8,9 +8,8 @@
 
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
+#include "IR_config.h"
 
-
-#define IR_MAXSIGNALBUFFER			(255u)
 
 
 #if IR_MAXSIGNALBUFFER<=255
@@ -32,6 +31,7 @@ static u8 _u8InterpetBitFrameNEC(volatile u32* copy_u32PtrBit);
 static u8 _u8GetFrameData(volatile u32* copy_u32PtrBuffer,ir_type_index copy_start,u8 *copy_u8RetPtrAddress,u8 *copy_u8RetPtrData);
 static u8 _u8CheckFrameRepeat(volatile u32* copy_u32PtrFrame);
 static u8 _u8CheckFrameRepeatEnd(volatile u32* copy_u32PtrFrame);
+static u8 _u8FrameCheckNEC(ir_type_index copy_u8FrameStartIndex,volatile u32* copy_u32PtrFrameBuffer);
 static void _voidClearu32BufferRange(u32*Buffer,u16 StartIndex,u16 Length);
 static void _voidSetIsStart(void);
 static void _voidSetIsRepeat(void);

@@ -69,6 +69,8 @@ extern void MTIMR2to5_voidInit(u8 copy_u8TimerNumber, u16 copy_u16Prescaler)
 	/*Set/Clr Bit 0 (CEN) in(TIMx_CR1) to enable/Disable counter CEN*/
 	TIMx[copy_u8TimerNumber]->CR1=0x0084;
 
+	if(copy_u8TimerNumber==MTIMER_5)
+		asm("nop");
 	/*TIMx_CR2 not used by me now*/
 	/*TIMx slave mode control register (TIMx_SMCR) not used by me now*/
 	/*TIMx DMA/Interrupt enable register (TIMx_DIER)*/
@@ -357,23 +359,47 @@ extern void MTIMR2to5_voidClrAlarmMissedShot(u8 copy_u8TimerNumber,u8 copy_u8Con
 
 void TIM2_IRQHandler(void)
 {
-	if (TIMx_u8ArrModeOfInterval[0] == TIMx_SINGLE_INTERVAL)
+	if (TIMx_u8ArrModeOfInterval[MTIMER_2] == TIMx_SINGLE_INTERVAL)
 	{
 		/*Disable Update Interrupt*/
-		CLR_BIT(TIMx[0]->DIER,0);
+		CLR_BIT(TIMx[MTIMER_2]->DIER,0);
 		/*Disable Counter */
-		CLR_BIT(TIMx[0]->CR1,0);
+		CLR_BIT(TIMx[MTIMER_2]->CR1,0);
 		/*Reset Auto Reload Register*/
-		TIMx[0]-> ARR = 0;
+		TIMx[MTIMER_2]-> ARR = 0;
 
 		/*Reset callBack*/
-		TIMx_ArrPtrCallBack[0]=NULL;
+		TIMx_ArrPtrCallBack[MTIMER_2]=NULL;
 	}
 
 	/*Clear Flag*/
-	CLR_BIT(TIMx[0]->SR,0);
+	CLR_BIT(TIMx[MTIMER_2]->SR,0);
 
 	/*Call Callback  */
-	if(NULL != TIMx_ArrPtrCallBack[0])
-		TIMx_ArrPtrCallBack[0]();
+	if(NULL != TIMx_ArrPtrCallBack[MTIMER_2])
+		TIMx_ArrPtrCallBack[MTIMER_2]();
+}
+
+
+void TIM4_IRQHandler(void)
+{
+	if (TIMx_u8ArrModeOfInterval[MTIMER_4] == TIMx_SINGLE_INTERVAL)
+	{
+		/*Disable Update Interrupt*/
+		CLR_BIT(TIMx[MTIMER_4]->DIER,0);
+		/*Disable Counter */
+		CLR_BIT(TIMx[MTIMER_4]->CR1,0);
+		/*Reset Auto Reload Register*/
+		TIMx[MTIMER_4]-> ARR = 0;
+
+		/*Reset callBack*/
+		TIMx_ArrPtrCallBack[MTIMER_4]=NULL;
+	}
+
+	/*Clear Flag*/
+	CLR_BIT(TIMx[MTIMER_4]->SR,0);
+
+	/*Call Callback  */
+	if(NULL != TIMx_ArrPtrCallBack[MTIMER_4])
+		TIMx_ArrPtrCallBack[MTIMER_4]();
 }

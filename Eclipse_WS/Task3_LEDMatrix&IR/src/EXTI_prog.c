@@ -14,7 +14,6 @@
 #include "EXTI_config.h"
 #include "EXTI_private.h"
 
-#define NULL		(void * )0
 
 //static void (* EXTI0_CallBack) (void) = NULL ;
 
