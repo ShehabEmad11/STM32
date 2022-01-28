@@ -11,6 +11,12 @@
 #include "LEDMRX_database.h"
 
 
+/*TODO:Check the case where global_irDatacounter is not aligned with localstaic_bufferindex
+	   could be due to, Invalid signals which is checked every 1ms in case they came after valid repeat/start frame */
+//TODO:Check the behavior of Partial returns not completely checked cause drop in frames
+//TODO: try to remove isStart and isRepeat dependencies
+
+
 
 #define BSW_CONTEXT					(MTIMx_CONTEXT0)
 #define	BSW_CYCLIC_PERIOD_Ms		(2500ul)			 //(minimum for LEDMRX))
@@ -25,6 +31,7 @@
 
 uint8 AppPlayFlag=0;
 
+#if 0
 static void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
 {
 	u8 i;
@@ -38,7 +45,7 @@ static void vid_clearBuffer(void* buff,u8 buffsize,u8 sizedatatype)
 			*((u32*)buff+i)=0;
 	}
 }
-
+#endif
 
 static void App_voidReadAndReact(u8 Data)
 {
@@ -346,9 +353,8 @@ static void App_voidReadAndReact(u8 Data)
  */
 void main()
 {
-	//TODO:This array to be removed after debugging and check on local var no need to array
-	u8 volatile DataFlagArr[50]={0},local_tempLastDataQ=0;
-	u8 AddresQ,DataQ[1]={0},local_u8ExtractIRDataFlag=0;
+	u8 volatile DataFlag=0,local_tempLastDataQ=0;
+	u8 AddresQ,DataQ=0,local_u8ExtractIRDataFlag=0;
 	u8 j=0,i=0;
 	TIMxContext_t local_strCurrAlarmInfo;
 
@@ -461,13 +467,9 @@ void main()
 			local_u32APPBaseTicksCounter++;
 
 
+
 			if(startdelayflag)
 				local_u32DelayCounter++;
-
-
-
-			/*Every 10 ms*/
-			//if(local_u32APPBaseTicksCounter %2 ==0);
 
 
 			/*Keep pooling to check if valid start is received*/
@@ -479,6 +481,7 @@ void main()
 				startdelayflag=1;
 				local_u32DelayCounter=0;
 			}
+
 			//Each count is 1ms
 			if(local_u32DelayCounter==56)
 			{
@@ -489,64 +492,53 @@ void main()
 
 			if(local_u8ExtractIRDataFlag)
 			{
-				if(i>49)
-				{
-					//Reset buffer index
-					i=0;
-					/*Reset Buffer*/
-					vid_clearBuffer((void*)DataFlagArr,(sizeof(DataFlagArr)/sizeof(DataFlagArr[0])) ,sizeof(DataFlagArr[0]) );
-				}
-				if(j>0)
-				{
-					//Reset DataQ index
-					j=0;
-					/*Reset DataQbuffer*/
-					vid_clearBuffer((void*)DataQ, (sizeof(DataQ)/sizeof(DataQ[0])) ,sizeof(DataQ[0]) );
-				}
-
 				/*Read Raw signals and extract Pure Data*/
-				DataFlagArr[i]=HIR_u8ExtractDataFromBuffer(&AddresQ, &DataQ[j]);
-				if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA_EMPTYBUF)
+				DataFlag=HIR_u8ExtractDataFromBuffer(&AddresQ, &DataQ);
+				if(DataFlag==IR_DATA_NO_VALID_DATA_EMPTYBUF)
 				{
 					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
 					i++;
 					local_u8ExtractIRDataFlag=0;
 				}
-				else if(DataFlagArr[i]==IR_DATA_NO_VALID_DATA_PARTIALBUF)
+				else if(DataFlag==IR_DATA_NO_VALID_DATA_PARTIALBUF)
 				{
 					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
 					i++;
 				}
-				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_EMPTYBUF)
+				else if(DataFlag==IR_DATA_EXTRACTED_EMPTYBUF)
 				{
 					/*Save Last Received Data*/
-					local_tempLastDataQ=DataQ[j];
-					App_voidReadAndReact(DataQ[j]);
+					local_tempLastDataQ=DataQ;
+					App_voidReadAndReact(DataQ);
 					/*Break loop no data left*/
 					i++;
 					j++;
 					local_u8ExtractIRDataFlag=0;
 					continue;
 				}
-				else if(DataFlagArr[i]==IR_DATA_EXTRACTED_PARTIALBUF)
+				else if(DataFlag==IR_DATA_EXTRACTED_PARTIALBUF)
 				{
 					/*Save Last Received Data*/
-					local_tempLastDataQ=DataQ[j];
-					App_voidReadAndReact(DataQ[j]);
+					local_tempLastDataQ=DataQ;
+					App_voidReadAndReact(DataQ);
 					/*Don't Break loop keep getting data*/
 					i++;
 					j++;
+#if 0
+					local_u8ExtractIRDataFlag=0;
+					continue;
+#endif
 				}
-				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
+				else if(DataFlag==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
 				{
 					/*Handle following cases:
 					 * 1-Case where last data received is still in DataQ buffer
 					 * 2-Case where we reseted DataQ and we received repeated signal
 					   (i.e First new data equals last data received before clearing buffer)*/
-					DataQ[j]=local_tempLastDataQ;
+					DataQ=local_tempLastDataQ;
 					/*Ignore repeated*/
 					//TODO:Handle repeated
-					DataQ[j]=0;
+					DataQ=0;
 					/*Break loop no data left*/
 					i++;
 					j++;
@@ -554,22 +546,27 @@ void main()
 					continue;
 					//break;
 				}
-				else if(DataFlagArr[i]==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
+				else if(DataFlag==IR_DATA_REPEATEXTRACTED_PARTIALBUF)
 				{
 					/*Handle following cases:
 					 * 1-Case where last data received is still in buffer
 					 * 2-Case where we reseted DataQ and we received repeated signal
 					   (i.e First new data equals last data received before clearing buffer)*/
-					DataQ[j]=local_tempLastDataQ;
+					DataQ=local_tempLastDataQ;
 					/*Ignore repeated*/
 					//TODO:Handle repeated
-					DataQ[j]=0;
+					DataQ=0;
 					/*Don't Break loop keep getting data*/
 					i++;
 					j++;
+
+#if 0
+					local_u8ExtractIRDataFlag=0;
+					continue;
+#endif
 				}
 
-				else if(DataFlagArr[i]==IR_LOGICERROR || DataFlagArr[i]==IR_IMPOSSIBLETRET || DataFlagArr[i]==IR_DATA_NON_RECEIVED)
+				else if(DataFlag==IR_LOGICERROR || DataFlag==IR_IMPOSSIBLETRET || DataFlag==IR_DATA_NON_RECEIVED)
 					asm("nop");  //error
 
 

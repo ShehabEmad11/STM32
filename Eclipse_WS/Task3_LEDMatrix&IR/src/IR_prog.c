@@ -176,13 +176,6 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 				/*increment the buffer with 33 signal as it was valid frame*/
 				if( (u32)local_staticCurrentBufferIndex + (u32)IR_FRAMEBITLENGTH  >= (u32)IR_MAXSIGNALBUFFER)
 				{
-					/*Calculate how many buffer positions consumed by current frame before the end of buffer*/
-					UsedBufferSlots=IR_MAXSIGNALBUFFER - local_staticCurrentBufferIndex ;
-					/*Calculate the new local_staticCurrentBufferIndex after overflowing*/
-					local_staticCurrentBufferIndex=IR_FRAMEBITLENGTH - UsedBufferSlots;
-//					local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
-					/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
-					local_u8AllBufferCheckedFlag=1;
 					if(globalstatic_u8OverFlowFlag==TRUE)
 					{
 						/*Clear Overflow Flag only if the frame was VALID && Overflow is raised*/
@@ -190,6 +183,14 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 					}
 					else
 						asm("nop");    //error
+
+					/*Calculate how many buffer positions consumed by current frame before the end of buffer*/
+					UsedBufferSlots=IR_MAXSIGNALBUFFER - local_staticCurrentBufferIndex ;
+					/*Calculate the new local_staticCurrentBufferIndex after overflowing*/
+					local_staticCurrentBufferIndex=IR_FRAMEBITLENGTH - UsedBufferSlots;
+//					local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+					/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
+					local_u8AllBufferCheckedFlag=1;
 				}
 				else
 				{
@@ -217,13 +218,6 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 			/*increment the buffer with 2 signal as it was repeated frame*/
 			if( (u32)local_staticCurrentBufferIndex+ (u32)IR_REPEATEDFRAMEBITLENGTH  >= (u32)IR_MAXSIGNALBUFFER)
 			{
-				/*Calculate how many buffer positions consumed by current frame before the end of buffer*/
-				UsedBufferSlots=IR_MAXSIGNALBUFFER - local_staticCurrentBufferIndex ;
-				/*Calculate the new local_staticCurrentBufferIndex after overflowing*/
-				local_staticCurrentBufferIndex=IR_REPEATEDFRAMEBITLENGTH - UsedBufferSlots;
-//				local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
-				/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
-				local_u8AllBufferCheckedFlag=1;
 				if(globalstatic_u8OverFlowFlag==TRUE)
 				{
 					/*Clear Overflow Flag only if the frame was repeated && Overflow is raised*/
@@ -231,6 +225,14 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 				}
 				else
 					asm("nop");    //error
+
+				/*Calculate how many buffer positions consumed by current frame before the end of buffer*/
+				UsedBufferSlots=IR_MAXSIGNALBUFFER - local_staticCurrentBufferIndex ;
+				/*Calculate the new local_staticCurrentBufferIndex after overflowing*/
+				local_staticCurrentBufferIndex=IR_REPEATEDFRAMEBITLENGTH - UsedBufferSlots;
+//				local_staticCurrentBufferIndex=IR_MAXSIGNALBUFFER;
+				/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
+				local_u8AllBufferCheckedFlag=1;
 			}
 			else
 			{
@@ -245,8 +247,6 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 			  so we have to increment current buffer position and continue checking buffer in loop */
 			if( (u32)local_staticCurrentBufferIndex + 1ul  >= (u32)IR_MAXSIGNALBUFFER)
 			{
-				/*Reset buffer index if we are at the end of the buffer*/
-				local_staticCurrentBufferIndex=0ul;
 				/*Set Local all bufferCheckedFlag to indicate that all buffer is checked*/
 				local_u8AllBufferCheckedFlag=1;
 				if(globalstatic_u8OverFlowFlag==TRUE)
@@ -256,6 +256,9 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 				}
 				else
 					asm("nop");    //error
+
+				/*Reset buffer index if we are at the end of the buffer*/
+				local_staticCurrentBufferIndex=0ul;
 			}
 			else
 			{
