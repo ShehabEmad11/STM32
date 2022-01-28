@@ -347,11 +347,11 @@ extern IR_enuExtractResult_t HIR_u8ExtractDataFromBuffer(u8 *copy_u8RetPtrAddres
 	return IR_IMPOSSIBLETRET;
 }
 
-extern void _voidSetIsStart(void)
+static void _voidSetIsStart(void)
 {
 	globalstatic_u8IRIsStart=1;
 }
-extern void _voidSetIsRepeat(void)
+static void _voidSetIsRepeat(void)
 {
 	globalstatic_u8IRIsRepeat=1;
 }
