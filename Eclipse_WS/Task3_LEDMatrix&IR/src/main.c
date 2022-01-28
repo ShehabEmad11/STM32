@@ -12,7 +12,10 @@
 
 
 /*TODO:Check the case where global_irDatacounter is not aligned with localstaic_bufferindex
-	   could be due to, Invalid signals which is checked every 1ms in case they came after valid repeat/start frame */
+ * most likely due to reception of valid frame at index[MAX-33](for example 7) will not cause overflow until next bit received
+ * in interrupt handler is side while in extraction function the staticbufferindex needs to be reset
+ * POSSIBLE_SOL:loop until localstaic_bufferindex catches with global_irDatacounter
+   could be due to, Invalid signals which is checked every 1ms in case they came after valid repeat/start frame */
 //TODO:Check the behavior of Partial returns not completely checked cause drop in frames
 //TODO: try to remove isStart and isRepeat dependencies
 
@@ -381,7 +384,10 @@ void main()
 	MTIMR2to5_voidInit(MTIMER_2, 7);
 
 
+
 	HIR_voidEnable(MEXTI_1,GPIOB);
+
+	MGPIO_voidSetPinDirection(GPIOA,PIN10, OUTPUT_SPEED_10MHZ_PP);
 
 	HLEDMRX_voidInit();
 
@@ -498,21 +504,27 @@ void main()
 				{
 					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
 					i++;
+
+					/*Break the Checking loop as no data left to be checked*/
 					local_u8ExtractIRDataFlag=0;
+					continue;
 				}
 				else if(DataFlag==IR_DATA_NO_VALID_DATA_PARTIALBUF)
 				{
 					/*Don't increment index of DataQ as it hasn't been updated (because of invalid data)*/
 					i++;
+
+					/*Don't Break the Checking loop as we didn't got the frame yet*/
 				}
 				else if(DataFlag==IR_DATA_EXTRACTED_EMPTYBUF)
 				{
 					/*Save Last Received Data*/
 					local_tempLastDataQ=DataQ;
 					App_voidReadAndReact(DataQ);
-					/*Break loop no data left*/
 					i++;
 					j++;
+
+					/*stop getting data as the frame Flagged is already received and also no more data to be extracted */
 					local_u8ExtractIRDataFlag=0;
 					continue;
 				}
@@ -521,13 +533,12 @@ void main()
 					/*Save Last Received Data*/
 					local_tempLastDataQ=DataQ;
 					App_voidReadAndReact(DataQ);
-					/*Don't Break loop keep getting data*/
 					i++;
 					j++;
-#if 0
-					local_u8ExtractIRDataFlag=0;
-					continue;
-#endif
+
+					/*stop getting data as the frame Flagged is already received and no need to continue extraction */
+//					local_u8ExtractIRDataFlag=0;
+//					continue;
 				}
 				else if(DataFlag==IR_DATA_REPEATEXTRACTED_EMPTYBUF)
 				{
@@ -539,7 +550,7 @@ void main()
 					/*Ignore repeated*/
 					//TODO:Handle repeated
 					DataQ=0;
-					/*Break loop no data left*/
+					/*Break loop as no data left*/
 					i++;
 					j++;
 					local_u8ExtractIRDataFlag=0;
@@ -556,20 +567,17 @@ void main()
 					/*Ignore repeated*/
 					//TODO:Handle repeated
 					DataQ=0;
-					/*Don't Break loop keep getting data*/
 					i++;
 					j++;
 
-#if 0
-					local_u8ExtractIRDataFlag=0;
-					continue;
-#endif
+					/*stop getting data as the frame Flagged is already received and no need to continue extraction */
+//					local_u8ExtractIRDataFlag=0;
+//					continue;
+					/*Don't Break the Checking loop as we didn't got the frame yet*/
 				}
 
 				else if(DataFlag==IR_LOGICERROR || DataFlag==IR_IMPOSSIBLETRET || DataFlag==IR_DATA_NON_RECEIVED)
 					asm("nop");  //error
-
-
 
 			}//condition checks for valid data
 			App_voidReadAndReact(0);
