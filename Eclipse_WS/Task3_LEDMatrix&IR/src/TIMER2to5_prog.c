@@ -27,6 +27,7 @@ static void(*TIMx_ArrPtrCallBack[4])(void)={NULL,NULL,NULL,NULL};
 const uint32 TIMx_ArrBaseTick[4]={TIM2_BASETICK_Ms,TIM3_BASETICK_Ms,TIM4_BASETICK_Ms,TIM5_BASETICK_Ms};
 
 /*With 7 prescaler, we got min time of 1Ms and max Time of 65535Ms=65ms*/
+/*Note That only TIM2 to TIM4 peripherals are in STM32F103C8T6 device*/
 extern void MTIMR2to5_voidInit(u8 copy_u8TimerNumber, u16 copy_u16Prescaler)
 {
 	u8 ContextIterator;
@@ -69,8 +70,6 @@ extern void MTIMR2to5_voidInit(u8 copy_u8TimerNumber, u16 copy_u16Prescaler)
 	/*Set/Clr Bit 0 (CEN) in(TIMx_CR1) to enable/Disable counter CEN*/
 	TIMx[copy_u8TimerNumber]->CR1=0x0084;
 
-	if(copy_u8TimerNumber==MTIMER_5)
-		asm("nop");
 	/*TIMx_CR2 not used by me now*/
 	/*TIMx slave mode control register (TIMx_SMCR) not used by me now*/
 	/*TIMx DMA/Interrupt enable register (TIMx_DIER)*/

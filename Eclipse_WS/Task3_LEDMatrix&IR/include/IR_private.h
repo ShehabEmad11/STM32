@@ -24,7 +24,7 @@
 enum IR_FRAMESTATUS {IR_FRAMESTATUS_INVALID,IR_FRAMESTATUS_VALID,IR_FRAMESTATUS_REPEATED};
 
 static void _voidTimeOutHandler(void);
-static void _voidCopyFrame(u32* Dest,u32 *Src,u8 SrcStartIndex);
+static void _voidCopyFrame(u32* Dest,u32 *Src,ir_type_index SrcStartIndex);
 static u8 _u8CheckSubFrameInversion(ir_type_index copy_u8Start,volatile u32* copy_u32PtrFrame);
 static u8 _u8CheckFrameStart(ir_type_index copy_u8Start,volatile u32* copy_u32PtrFrame);
 static u8 _u8InterpetBitFrameNEC(volatile u32* copy_u32PtrBit);
@@ -32,7 +32,7 @@ static u8 _u8GetFrameData(volatile u32* copy_u32PtrBuffer,ir_type_index copy_sta
 static u8 _u8CheckFrameRepeat(volatile u32* copy_u32PtrFrame);
 static u8 _u8CheckFrameRepeatEnd(volatile u32* copy_u32PtrFrame);
 static u8 _u8FrameCheckNEC(ir_type_index copy_u8FrameStartIndex,volatile u32* copy_u32PtrFrameBuffer);
-static void _voidClearu32BufferRange(u32*Buffer,u16 StartIndex,u16 Length);
+static void _voidClearu32BufferRange(u32*Buffer,ir_type_index StartIndex,ir_type_index Length);
 static void _voidSetIsStart(void);
 static void _voidSetIsRepeat(void);
 #if 0

@@ -23,5 +23,7 @@ typedef signed char 		sint8;
 #define E_NOT_OK	(0u)
 #define TRUE		(1u)
 #define FALSE		(0u)
+#define STD_ON		(1u)
+#define STD_OFF		(0u)
 #endif
 
