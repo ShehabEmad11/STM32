@@ -21,6 +21,8 @@ static TIMxContext_t TIMx_astrAlarmContext[4][TIMR2to5_MAXCONTEXTS];
 /* Define static global Variable for interval mode */
 static u8 TIMx_u8ArrModeOfInterval[4];
 
+static u16 TIMx_u16ArrCurrTimerPeriod[4];
+
 /* Declare Array of Ptr to Callback static Global Variable */
 static void(*TIMx_ArrPtrCallBack[4])(void)={NULL,NULL,NULL,NULL};
 
@@ -171,6 +173,9 @@ extern void MTIMR2to5_voidSetTimerPeriodic(u8 copy_u8TimerNumber,u16 copy_u16Per
 	/* Set Mode to Periodic*/
 	TIMx_u8ArrModeOfInterval[copy_u8TimerNumber] = TIMx_PERIODIC_INTERVAL;
 
+	/* Store current period*/
+	TIMx_u16ArrCurrTimerPeriod[copy_u8TimerNumber] = copy_u16PeriodMs;
+
 	/* Load ticks to load register */
 	TIMx[copy_u8TimerNumber]->ARR=copy_u16PeriodMs;
 
@@ -224,6 +229,9 @@ extern void MTIMR2to5_voidStopInterval(uint8 copy_u8TimerNumber)
 	/*Reset Counter Register (no need as it will be reset when next Set-interval called)*/
 	TIMx[copy_u8TimerNumber]-> CNT = 0;
 
+	/*Reset Current Period*/
+	TIMx_u16ArrCurrTimerPeriod[copy_u8TimerNumber]=0;
+
 	/*Reset callBack*/
 	TIMx_ArrPtrCallBack[copy_u8TimerNumber]=NULL;
 }
@@ -249,12 +257,22 @@ extern void MTIMR2to5_voidSetCycAlarm_Ms(u8 copy_u8TimerNumber,u8 copy_u8Context
 
 	if(copy_u8ContextNumber>=TIMR2to5_MAXCONTEXTS)
 		return;
+
 	if(copy_u8TimerNumber>MTIMER_5)
 		return ;
+
+	/*If the corresponding Timer is not periodic yet*/
+	if(TIMx_u16ArrCurrTimerPeriod[copy_u8TimerNumber] == 0)
+		return;
+
+	/*If alarm is less than or not a multiple of Timer's ISR time then return*/
+	if ((copy_u32MsVal < TIMx_u16ArrCurrTimerPeriod[copy_u8TimerNumber]) || (copy_u32MsVal % TIMx_u16ArrCurrTimerPeriod[copy_u8TimerNumber] != 0))
+		return ;  //error Wrong cyclic time Configured
 
 	/*Alarm can't be less than the set Periodic Interval Timer*/
 	if(copy_u32MsVal < TIMx[copy_u8TimerNumber]-> ARR )
 		return;
+
 
 	/*Update Timer number to match with array in private file*/
 	//copy_u8TimerNumber=copy_u8TimerNumber-2;
